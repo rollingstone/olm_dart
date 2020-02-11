@@ -1,0 +1,14 @@
+// Copyright (c) 2020 Famedly GmbH
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+import 'dart:ffi';
+import 'dart:io';
+import 'package:ffi/ffi.dart';
+
+final libolm = Platform.isIOS
+    ? DynamicLibrary.process()
+    : DynamicLibrary.open('libolm.so.3');
+
+void throw_olm(Pointer<Utf8> message) {
+  throw Exception(Utf8.fromUtf8(message));
+}
