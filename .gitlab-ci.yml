@@ -1,0 +1,47 @@
+# Copyright (c) 2020 Famedly GmbH
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+stages:
+  - coverage
+  - deploy
+
+coverage:
+  image: debian:testing
+  stage: coverage
+  coverage: '/^\s+lines.+: (\d+.\d*%)/'
+  dependencies: []
+  script:
+    - apt update
+    - apt install -y curl gnupg2
+    - curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    - curl https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list
+    - apt update
+    - apt install -y dart chromium lcov libolm3
+    - ln -s /usr/lib/dart/bin/pub /usr/bin/
+    - useradd -m test
+    - chown -R 'test:' '.'
+    - su -c ./scripts/prepare.sh test
+    - su -c ./scripts/test.sh test
+  artifacts:
+    paths:
+      - coverage/
+
+code_analyze:
+  image: cirrusci/flutter
+  stage: coverage
+  dependencies: []
+  allow_failure: true
+  script:
+    - flutter analyze
+
+pages:
+  stage: deploy
+  image: cirrusci/flutter
+  script:
+    - ./scripts/doc.sh
+    - mv doc/api public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
