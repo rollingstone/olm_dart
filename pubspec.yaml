@@ -2,6 +2,14 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 name: olm
+description: Dart bindings for Olm
+author: Famedly GmbH <info@famedly.com>
+homepage: https://famedly.gitlab.io/libraries/dart-olm/
+repository: https://gitlab.com/famedly/libraries/dart-olm
+
+environment:
+  sdk: ">=2.6.0 <3.0.0"
+
 version: 0.0.0
 dependencies:
   js: ^0.6.0
