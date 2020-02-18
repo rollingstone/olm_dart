@@ -7,7 +7,11 @@ import 'package:ffi/ffi.dart';
 
 final libolm = Platform.isIOS
     ? DynamicLibrary.process()
-    : DynamicLibrary.open('libolm.so.3');
+    : DynamicLibrary.open(Platform.isAndroid
+        ? 'libolm.so'
+        : Platform.isWindows
+            ? 'libolm.dll'
+            : Platform.isMacOS ? 'libolm.3.dylib' : 'libolm.so.3');
 
 void throw_olm(Pointer<Utf8> message) {
   throw Exception(Utf8.fromUtf8(message));
