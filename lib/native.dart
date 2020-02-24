@@ -303,16 +303,29 @@ class Utility {
   }
 
   String sha256(String input) {
-    final units = utf8.encode(input);
-    final outLen = olm_sha256_length(_inst);
-    final mem = allocate<Uint8>(count: units.length + outLen);
-    final outMem = mem.elementAt(units.length);
-    mem.asTypedList(units.length).setAll(0, units);
+    return sha256_bytes(utf8.encode(input));
+  }
+
+  /// Not implemented for Web in upstream olm.
+  String sha256_bytes(Uint8List input) {
+    final mem = allocate<Uint8>(count: input.length);
+    mem.asTypedList(input.length).setAll(0, input);
     try {
-      olm_sha256(_inst, mem, units.length, outMem, outLen);
-      return utf8.decode(outMem.asTypedList(outLen));
+      return sha256_pointer(mem, input.length);
     } finally {
       ffi.free(mem);
+    }
+  }
+
+  /// Available for Native only.
+  String sha256_pointer(Pointer<Uint8> input, int size) {
+    final outLen = olm_sha256_length(_inst);
+    final outMem = allocate<Uint8>(count: outLen);
+    try {
+      olm_sha256(_inst, input, size, outMem, outLen);
+      return utf8.decode(outMem.asTypedList(outLen));
+    } finally {
+      ffi.free(outMem);
     }
   }
 

@@ -6,6 +6,7 @@ library js;
 import 'src/js_promise.dart';
 import 'package:js/js.dart';
 import 'dart:async';
+import 'dart:typed_data';
 
 @JS("init")
 external Promise<void> _init();
@@ -72,6 +73,10 @@ class Utility {
   external Utility();
   external void free();
   external String sha256(String input);
+
+  /// Not implemented for Web in upstream olm.
+  external String sha256_bytes(Uint8List input);
+
   external void ed25519_verify(String key, String message, String signature);
 }
 
