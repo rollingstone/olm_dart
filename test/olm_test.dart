@@ -12,7 +12,7 @@ void main() async {
   await olm.init();
 
   test("get library version", () {
-    olm.get_library_version();
+    expect(olm.get_library_version(), allOf(isList, hasLength(3)));
   });
 
   test("pickle/unpickle an account", () {
@@ -30,7 +30,7 @@ void main() async {
     expect(id_key1, id_key2);
     expect(ot_key1, ot_key2);
     account2.mark_keys_as_published();
-    account2.max_number_of_one_time_keys();
+    expect(account2.max_number_of_one_time_keys(), isPositive);
     account2.free();
   });
 
@@ -50,7 +50,7 @@ void main() async {
     expect(bob_s.has_received_message(), false);
     final result = bob_s.decrypt(alice_message.type, alice_message.body);
     bob.remove_one_time_keys(bob_s);
-    bob_s.session_id();
+    expect(bob_s.session_id(), allOf(isA<String>(), isNotEmpty));
     expect(bob_s.has_received_message(), true);
     bob_s.free();
     alice_s.free();
@@ -100,17 +100,17 @@ void main() async {
   test("send a group message", () {
     final outbound_session = olm.OutboundGroupSession();
     outbound_session.create();
-    outbound_session.session_id();
+    expect(outbound_session.session_id(), allOf(isA<String>(), isNotEmpty));
     final session_key = outbound_session.session_key();
-    outbound_session.message_index();
+    expect(outbound_session.message_index(), 0);
     final inbound_session = olm.InboundGroupSession();
     inbound_session.create(session_key);
     final ciphertext = outbound_session.encrypt(test_message);
     final decrypted = inbound_session.decrypt(ciphertext);
 
-    inbound_session.session_id();
-    inbound_session.first_known_index();
-    inbound_session.export_session(0);
+    expect(inbound_session.session_id(), allOf(isA<String>(), isNotEmpty));
+    expect(inbound_session.first_known_index(), 0);
+    expect(inbound_session.export_session(0), allOf(isA<String>(), isNotEmpty));
 
     outbound_session.free();
     inbound_session.free();
