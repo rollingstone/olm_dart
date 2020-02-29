@@ -219,8 +219,8 @@ class Session {
     return _readStr(olm_session_id_length, olm_session_id, _inst);
   }
 
-  int has_received_message() {
-    return olm_session_has_received_message(_inst);
+  bool has_received_message() {
+    return olm_session_has_received_message(_inst) != 0;
   }
 
   int encrypt_message_type() {

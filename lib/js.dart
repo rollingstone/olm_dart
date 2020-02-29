@@ -60,7 +60,7 @@ class Session {
   external void create_inbound(Account account, String message);
   external void create_inbound_from(Account account, String identity_key, String one_time_key);
   external String session_id();
-  external int has_received_message();
+  external bool has_received_message();
   external int encrypt_message_type();
   external int matches_inbound(String message);
   external int matches_inbound_from(String identity_key, String message);

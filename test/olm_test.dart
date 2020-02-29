@@ -47,10 +47,11 @@ void main() async {
     final alice_message = alice_s.encrypt(test_message);
     final bob_s = olm.Session();
     bob_s.create_inbound(bob, alice_message.body);
+    expect(bob_s.has_received_message(), false);
     final result = bob_s.decrypt(alice_message.type, alice_message.body);
     bob.remove_one_time_keys(bob_s);
     bob_s.session_id();
-    bob_s.has_received_message();
+    expect(bob_s.has_received_message(), true);
     bob_s.free();
     alice_s.free();
     bob.free();
