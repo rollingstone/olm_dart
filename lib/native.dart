@@ -227,12 +227,12 @@ class Session {
     return olm_encrypt_message_type(_inst);
   }
 
-  int matches_inbound(String message) {
+  bool matches_inbound(String message) {
     final message_units = utf8.encode(message);
     final mem = allocate<Uint8>(count: message_units.length);
     mem.asTypedList(message_units.length).setAll(0, message_units);
     try {
-      return olm_matches_inbound_session(_inst, mem, message_units.length);
+      return olm_matches_inbound_session(_inst, mem, message_units.length) != 0;
     } finally {
       ffi.free(mem);
     }

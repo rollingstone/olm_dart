@@ -185,7 +185,7 @@ void main() async {
     expect(() => olm.InboundGroupSession().unpickle(test_key, ""), throwsA(anything));
     expect(() => olm.OutboundGroupSession().unpickle(test_key, ""), throwsA(anything));
     expect(() => olm.Session().create_inbound_from(olm.Account(), "", ""), throwsA(anything));
-    olm.Session().matches_inbound("");
+    expect(olm.Session().matches_inbound(""), false);
     expect(() => olm.Session().matches_inbound_from("", ""), throwsA(anything));
     expect(() => olm.InboundGroupSession().import_session(""), throwsA(anything));
   });
