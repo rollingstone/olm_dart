@@ -238,14 +238,14 @@ class Session {
     }
   }
 
-  int matches_inbound_from(String identity_key, String message) {
+  bool matches_inbound_from(String identity_key, String message) {
     final identity_key_units = utf8.encode(identity_key);
     final message_units = utf8.encode(message);
     final mem = allocate<Uint8>(count: identity_key_units.length + message_units.length);
     mem.asTypedList(identity_key_units.length).setAll(0, identity_key_units);
     mem.elementAt(identity_key_units.length).asTypedList(message_units.length).setAll(0, message_units);
     try {
-      return olm_matches_inbound_session_from(_inst, mem, identity_key_units.length, mem.elementAt(identity_key_units.length), message_units.length);
+      return olm_matches_inbound_session_from(_inst, mem, identity_key_units.length, mem.elementAt(identity_key_units.length), message_units.length) != 0;
     } finally {
       ffi.free(mem);
     }
