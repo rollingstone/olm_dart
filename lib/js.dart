@@ -62,8 +62,8 @@ class Session {
   external String session_id();
   external bool has_received_message();
   external int encrypt_message_type();
-  external int matches_inbound(String message);
-  external int matches_inbound_from(String identity_key, String message);
+  external bool matches_inbound(String message);
+  external bool matches_inbound_from(String identity_key, String message);
   external EncryptResult encrypt(String plaintext);
   external String decrypt(int message_type, String message);
 }
