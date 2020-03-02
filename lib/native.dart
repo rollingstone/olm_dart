@@ -215,10 +215,11 @@ class Session {
     final identity_key_units = utf8.encode(identity_key);
     final one_time_key_units = utf8.encode(one_time_key);
     final mem = allocate<Uint8>(count: identity_key_units.length + one_time_key_units.length);
+    final otMem = mem.elementAt(identity_key_units.length);
     try {
       mem.asTypedList(identity_key_units.length).setAll(0, identity_key_units);
-      mem.elementAt(identity_key_units.length).asTypedList(one_time_key_units.length).setAll(0, one_time_key_units);
-      olm_create_inbound_session_from(_inst, account._inst, mem, identity_key_units.length, mem.elementAt(identity_key_units.length), one_time_key_units.length);
+      otMem.asTypedList(one_time_key_units.length).setAll(0, one_time_key_units);
+      olm_create_inbound_session_from(_inst, account._inst, mem, identity_key_units.length, otMem, one_time_key_units.length);
     } finally {
       ffi.free(mem);
     }
@@ -251,10 +252,11 @@ class Session {
     final identity_key_units = utf8.encode(identity_key);
     final message_units = utf8.encode(message);
     final mem = allocate<Uint8>(count: identity_key_units.length + message_units.length);
+    final mem2 = mem.elementAt(identity_key_units.length);
     mem.asTypedList(identity_key_units.length).setAll(0, identity_key_units);
-    mem.elementAt(identity_key_units.length).asTypedList(message_units.length).setAll(0, message_units);
+    mem2.asTypedList(message_units.length).setAll(0, message_units);
     try {
-      return olm_matches_inbound_session_from(_inst, mem, identity_key_units.length, mem.elementAt(identity_key_units.length), message_units.length) != 0;
+      return olm_matches_inbound_session_from(_inst, mem, identity_key_units.length, mem2, message_units.length) != 0;
     } finally {
       ffi.free(mem);
     }
