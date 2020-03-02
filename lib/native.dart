@@ -92,10 +92,12 @@ class DecryptResult {
 class Account {
   Pointer<Uint8> _mem;
   Pointer<NativeType> _inst;
+
   Account() {
     _mem = allocate<Uint8>(count: olm_account_size());
     _inst = olm_account(_mem);
   }
+
   void free() {
     olm_clear_account(_inst);
     _inst = null;
@@ -156,10 +158,12 @@ class Account {
 class Session {
   Pointer<Uint8> _mem;
   Pointer<NativeType> _inst;
+
   Session() {
     _mem = allocate<Uint8>(count: olm_session_size());
     _inst = olm_session(_mem);
   }
+
   void free() {
     olm_clear_session(_inst);
     _inst = null;
@@ -293,10 +297,12 @@ class Session {
 class Utility {
   Pointer<Uint8> _mem;
   Pointer<NativeType> _inst;
+
   Utility() {
     _mem = allocate<Uint8>(count: olm_utility_size());
     _inst = olm_utility(_mem);
   }
+
   void free() {
     olm_clear_utility(_inst);
     _inst = null;
@@ -351,10 +357,12 @@ class Utility {
 class InboundGroupSession {
   Pointer<Uint8> _mem;
   Pointer<NativeType> _inst;
+
   InboundGroupSession() {
     _mem = allocate<Uint8>(count: olm_inbound_group_session_size());
     _inst = olm_inbound_group_session(_mem);
   }
+
   void free() {
     olm_clear_inbound_group_session(_inst);
     _inst = null;
@@ -427,10 +435,12 @@ class InboundGroupSession {
 class OutboundGroupSession {
   Pointer<Uint8> _mem;
   Pointer<NativeType> _inst;
+
   OutboundGroupSession() {
     _mem = allocate<Uint8>(count: olm_outbound_group_session_size());
     _inst = olm_outbound_group_session(_mem);
   }
+
   void free() {
     olm_clear_outbound_group_session(_inst);
     _inst = null;
