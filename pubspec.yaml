@@ -8,7 +8,7 @@ homepage: https://famedly.gitlab.io/libraries/dart-olm/
 repository: https://gitlab.com/famedly/libraries/dart-olm
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
+  sdk: ">=2.7.0 <3.0.0"
 
 version: 0.0.0
 dependencies:
