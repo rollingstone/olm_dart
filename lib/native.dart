@@ -260,6 +260,7 @@ class Session {
     final outMem = rndMem.elementAt(randomLen);
     try {
       mem.asTypedList(units.length).setAll(0, units);
+      _fillRandom(rndMem.asTypedList(randomLen));
       final result1 = encrypt_message_type();
       olm_encrypt(_inst, mem, units.length, rndMem, randomLen, outMem, outLen);
       final result2 = utf8.decode(outMem.asTypedList(outLen));
