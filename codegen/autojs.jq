@@ -46,7 +46,7 @@ foreach( foreach(
   | .c += ($l.s | count("{") - count("}"))
   | if .c == .co then del(.co) else . end
 ; if .p then
-    if .s | test("^import|[ .]_|void init|Pointer<") then {} else . end
+    if .s | test("^import|[ .]_|Future<|Pointer<") then {} else . end
   else empty end)
 ) as $x ({};
   if $x.s then

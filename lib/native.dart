@@ -67,6 +67,11 @@ void _createRandom(void Function(Pointer<NativeType>, Pointer<Uint8> random, int
   }
 }
 
+Future<void> init() {
+  olm_get_library_version; // just load the function, not calling it
+  return Future.sync(() {});
+}
+
 List<int> get_library_version() {
   final mem = allocate<Uint8>(count: 3);
   try {
@@ -485,5 +490,3 @@ class OutboundGroupSession {
     return _readStr(olm_outbound_group_session_key_length, olm_outbound_group_session_key, _inst);
   }
 }
-
-void init() {}
