@@ -189,4 +189,78 @@ void main() async {
     expect(() => olm.Session().matches_inbound_from("", ""), throwsA(anything));
     expect(() => olm.InboundGroupSession().import_session(""), throwsA(anything));
   });
+
+  test("send multiple messages, one direction", () async {
+    final alice = olm.Account();
+    final bob = olm.Account();
+    alice.create();
+    bob.create();
+    bob.generate_one_time_keys(1);
+    final bob_id_key = json.decode(bob.identity_keys())['curve25519'];
+    final bob_ot_key = json.decode(bob.one_time_keys())['curve25519']['AAAAAQ'];
+    final alice_s = olm.Session();
+    alice_s.create_outbound(alice, bob_id_key, bob_ot_key);
+    final alice_message_first = alice_s.encrypt(test_message);
+    final bob_s = olm.Session();
+    bob_s.create_inbound_from(bob, json.decode(alice.identity_keys())['curve25519'], alice_message_first.body);
+    final alice_decrypted_first = bob_s.decrypt(alice_message_first.type, alice_message_first.body);
+    expect(alice_decrypted_first, test_message);
+    bob.remove_one_time_keys(bob_s);
+
+    for (int i = 0; i < 10; i++) {
+      final alice_plain = "Alice $i";
+      try {
+        final alice_message = alice_s.encrypt(alice_plain);
+        final alice_decrypted = bob_s.decrypt(alice_message.type, alice_message.body);
+        expect(alice_decrypted, alice_plain);
+      } catch (e) {
+        print("Exception in round $i");
+        rethrow;
+      }
+    }
+
+    bob_s.free();
+    alice_s.free();
+    bob.free();
+    alice.free();
+  });
+
+  test("send multiple messages, round trip", () async {
+    final alice = olm.Account();
+    final bob = olm.Account();
+    alice.create();
+    bob.create();
+    bob.generate_one_time_keys(1);
+    final bob_id_key = json.decode(bob.identity_keys())['curve25519'];
+    final bob_ot_key = json.decode(bob.one_time_keys())['curve25519']['AAAAAQ'];
+    final alice_s = olm.Session();
+    alice_s.create_outbound(alice, bob_id_key, bob_ot_key);
+    final alice_message_first = alice_s.encrypt(test_message);
+    final bob_s = olm.Session();
+    bob_s.create_inbound_from(bob, json.decode(alice.identity_keys())['curve25519'], alice_message_first.body);
+    final alice_decrypted_first = bob_s.decrypt(alice_message_first.type, alice_message_first.body);
+    expect(alice_decrypted_first, test_message);
+    bob.remove_one_time_keys(bob_s);
+
+    for (int i = 0; i < 10; i++) {
+      final alice_plain = "Alice $i";
+      final bob_plain = "Bob $i";
+      try {
+        final alice_message = alice_s.encrypt(alice_plain);
+        final alice_decrypted = bob_s.decrypt(alice_message.type, alice_message.body);
+        expect(alice_decrypted, alice_plain);
+        final bob_message = bob_s.encrypt(bob_plain);
+        final bob_decrypted = alice_s.decrypt(bob_message.type, bob_message.body);
+        expect(bob_decrypted, bob_plain);
+      } catch (e) {
+        print("Exception in round $i");
+        rethrow;
+      }
+    }
+
+    bob_s.free();
+    alice_s.free();
+    bob.free();
+    alice.free();
+  });
 }
