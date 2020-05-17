@@ -263,4 +263,20 @@ void main() async {
     bob.free();
     alice.free();
   });
+
+  test("sas", () async {
+    const test_length = 42;
+
+    final sas1 = olm.SAS();
+    final sas1_pk = sas1.get_pubkey();
+    expect(sas1_pk, allOf(isA<String>(), isNotEmpty));
+    sas1.free();
+
+    final sas2 = olm.SAS();
+    sas2.set_their_key(sas1_pk);
+    expect(sas2.calculate_mac("INPUT", "INFO"), allOf(isA<String>(), isNotEmpty));
+    expect(sas2.calculate_mac_long_kdf("INPUT", "INFO"), allOf(isA<String>(), isNotEmpty));
+    expect(sas2.generate_bytes("INFO", test_length), allOf(isList, hasLength(test_length)));
+    sas2.free();
+  });
 }

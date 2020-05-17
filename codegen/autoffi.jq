@@ -28,7 +28,7 @@ def error_func:
     capture("(const )?(?<type>.*[^ ]) *\\*$")
   | .type
   | rtrimstr(" const")
-  | gsub("(?<ch>[A-Z])"; "_\(.ch | ascii_downcase)")
+  | gsub("(?<ch>[A-Z]+)"; "_\(.ch | ascii_downcase)")
   | ltrimstr("_")
   | "\(.)_last_error"
   else

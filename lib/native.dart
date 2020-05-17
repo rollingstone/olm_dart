@@ -11,6 +11,7 @@ import 'package:ffi/ffi.dart' as ffi;
 
 typedef _ObjectLengthFunc = int Function(Pointer<NativeType>);
 typedef _PickleUnpickleFunc = int Function(Pointer<NativeType>, Pointer<Uint8>, int, Pointer<Uint8>, int);
+typedef _CalculateMacFunc = int Function(Pointer<NativeType>, Pointer<Uint8>, int, Pointer<Uint8>, int, Pointer<Uint8>, int);
 
 String _readStr(_ObjectLengthFunc len, int Function(Pointer<NativeType>, Pointer<Uint8>, int) data, Pointer<NativeType> inst) {
   final l = len(inst);
@@ -49,6 +50,23 @@ void _unpickle(_PickleUnpickleFunc func, Pointer<NativeType> inst, String data, 
   } finally {
     free(mem);
   }
+}
+
+String _calculateMac(_CalculateMacFunc func, Pointer<NativeType> inst, String input, String info) {
+    final inputUnits = utf8.encode(input);
+    final infoUnits = utf8.encode(info);
+    final outMemLen = olm_sas_mac_length(inst);
+    final mem = allocate<Uint8>(count: inputUnits.length + infoUnits.length + outMemLen);
+    final infoMem = mem.elementAt(inputUnits.length);
+    final outMem = infoMem.elementAt(infoUnits.length);
+    try {
+      mem.asTypedList(inputUnits.length).setAll(0, inputUnits);
+      infoMem.asTypedList(infoUnits.length).setAll(0, infoUnits);
+      func(inst, mem, inputUnits.length, infoMem, infoUnits.length, outMem, outMemLen);
+      return utf8.decode(outMem.asTypedList(outMemLen));
+    } finally {
+      ffi.free(mem);
+    }
 }
 
 void _fillRandom(Uint8List list) {
@@ -490,5 +508,57 @@ class OutboundGroupSession {
 
   String session_key() {
     return _readStr(olm_outbound_group_session_key_length, olm_outbound_group_session_key, _inst);
+  }
+}
+
+class SAS {
+  Pointer<Uint8> _mem;
+  Pointer<NativeType> _inst;
+
+  SAS() {
+    _mem = allocate<Uint8>(count: olm_sas_size());
+    _inst = olm_sas(_mem);
+    _createRandom(olm_create_sas, olm_create_sas_random_length, _inst);
+  }
+
+  void free() {
+    olm_clear_sas(_inst);
+    _inst = null;
+    ffi.free(_mem);
+  }
+
+  String get_pubkey() {
+    return _readStr(olm_sas_pubkey_length, olm_sas_get_pubkey, _inst);
+  }
+
+  void set_their_key(String their_key) {
+    final units = utf8.encode(their_key);
+    final mem = allocate<Uint8>(count: units.length);
+    try {
+      mem.asTypedList(units.length).setAll(0, units);
+      olm_sas_set_their_key(_inst, mem, units.length);
+    } finally {
+      ffi.free(mem);
+    }
+  }
+
+  Uint8List generate_bytes(String info, int length) {
+    final units = utf8.encode(info);
+    final mem = allocate<Uint8>(count: units.length + length);
+    final outMem = mem.elementAt(units.length);
+    try {
+      olm_sas_generate_bytes(_inst, mem, units.length, outMem, length);
+      return outMem.asTypedList(length);
+    } finally {
+      ffi.free(mem);
+    }
+  }
+
+  String calculate_mac(String input, String info) {
+    return _calculateMac(olm_sas_calculate_mac, _inst, input, info);
+  }
+
+  String calculate_mac_long_kdf(String input, String info) {
+    return _calculateMac(olm_sas_calculate_mac_long_kdf, _inst, input, info);
   }
 }

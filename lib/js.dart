@@ -102,3 +102,14 @@ class OutboundGroupSession {
   external int message_index();
   external String session_key();
 }
+
+@JS()
+class SAS {
+  external SAS();
+  external void free();
+  external String get_pubkey();
+  external void set_their_key(String their_key);
+  external Uint8List generate_bytes(String info, int length);
+  external String calculate_mac(String input, String info);
+  external String calculate_mac_long_kdf(String input, String info);
+}

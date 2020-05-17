@@ -806,3 +806,128 @@ final _olm_ed25519_verify_unchecked = libolm.lookupFunction<
   IntPtr Function(Pointer<NativeType> utility, Pointer<Uint8> key, IntPtr key_length, Pointer<Uint8> message, IntPtr message_length, Pointer<Uint8> signature, IntPtr signature_length),
   int Function(Pointer<NativeType> utility, Pointer<Uint8> key, int key_length, Pointer<Uint8> message, int message_length, Pointer<Uint8> signature, int signature_length)
 >('olm_ed25519_verify');
+
+final olm_sas_last_error = libolm.lookupFunction<
+  Pointer<Utf8> Function(Pointer<NativeType> sas),
+  Pointer<Utf8> Function(Pointer<NativeType> sas)
+>('olm_sas_last_error');
+
+final olm_sas_size = libolm.lookupFunction<
+  IntPtr Function(),
+  int Function()
+>('olm_sas_size');
+
+final olm_sas = libolm.lookupFunction<
+  Pointer<NativeType> Function(Pointer<Uint8> memory),
+  Pointer<NativeType> Function(Pointer<Uint8> memory)
+>('olm_sas');
+
+int olm_clear_sas(Pointer<NativeType> sas) {
+  int result = _olm_clear_sas_unchecked(sas);
+  if (result == olm_error()) throw_olm(olm_sas_last_error(sas));
+  return result;
+}
+
+final _olm_clear_sas_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sas),
+  int Function(Pointer<NativeType> sas)
+>('olm_clear_sas');
+
+int olm_create_sas_random_length(Pointer<NativeType> sas) {
+  int result = _olm_create_sas_random_length_unchecked(sas);
+  if (result == olm_error()) throw_olm(olm_sas_last_error(sas));
+  return result;
+}
+
+final _olm_create_sas_random_length_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sas),
+  int Function(Pointer<NativeType> sas)
+>('olm_create_sas_random_length');
+
+int olm_create_sas(Pointer<NativeType> sas, Pointer<Uint8> random, int random_length) {
+  int result = _olm_create_sas_unchecked(sas, random, random_length);
+  if (result == olm_error()) throw_olm(olm_sas_last_error(sas));
+  return result;
+}
+
+final _olm_create_sas_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sas, Pointer<Uint8> random, IntPtr random_length),
+  int Function(Pointer<NativeType> sas, Pointer<Uint8> random, int random_length)
+>('olm_create_sas');
+
+int olm_sas_pubkey_length(Pointer<NativeType> sas) {
+  int result = _olm_sas_pubkey_length_unchecked(sas);
+  if (result == olm_error()) throw_olm(olm_sas_last_error(sas));
+  return result;
+}
+
+final _olm_sas_pubkey_length_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sas),
+  int Function(Pointer<NativeType> sas)
+>('olm_sas_pubkey_length');
+
+int olm_sas_get_pubkey(Pointer<NativeType> sas, Pointer<Uint8> pubkey, int pubkey_length) {
+  int result = _olm_sas_get_pubkey_unchecked(sas, pubkey, pubkey_length);
+  if (result == olm_error()) throw_olm(olm_sas_last_error(sas));
+  return result;
+}
+
+final _olm_sas_get_pubkey_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sas, Pointer<Uint8> pubkey, IntPtr pubkey_length),
+  int Function(Pointer<NativeType> sas, Pointer<Uint8> pubkey, int pubkey_length)
+>('olm_sas_get_pubkey');
+
+int olm_sas_set_their_key(Pointer<NativeType> sas, Pointer<Uint8> their_key, int their_key_length) {
+  int result = _olm_sas_set_their_key_unchecked(sas, their_key, their_key_length);
+  if (result == olm_error()) throw_olm(olm_sas_last_error(sas));
+  return result;
+}
+
+final _olm_sas_set_their_key_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sas, Pointer<Uint8> their_key, IntPtr their_key_length),
+  int Function(Pointer<NativeType> sas, Pointer<Uint8> their_key, int their_key_length)
+>('olm_sas_set_their_key');
+
+int olm_sas_generate_bytes(Pointer<NativeType> sas, Pointer<Uint8> info, int info_length, Pointer<Uint8> output, int output_length) {
+  int result = _olm_sas_generate_bytes_unchecked(sas, info, info_length, output, output_length);
+  if (result == olm_error()) throw_olm(olm_sas_last_error(sas));
+  return result;
+}
+
+final _olm_sas_generate_bytes_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sas, Pointer<Uint8> info, IntPtr info_length, Pointer<Uint8> output, IntPtr output_length),
+  int Function(Pointer<NativeType> sas, Pointer<Uint8> info, int info_length, Pointer<Uint8> output, int output_length)
+>('olm_sas_generate_bytes');
+
+int olm_sas_mac_length(Pointer<NativeType> sas) {
+  int result = _olm_sas_mac_length_unchecked(sas);
+  if (result == olm_error()) throw_olm(olm_sas_last_error(sas));
+  return result;
+}
+
+final _olm_sas_mac_length_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sas),
+  int Function(Pointer<NativeType> sas)
+>('olm_sas_mac_length');
+
+int olm_sas_calculate_mac(Pointer<NativeType> sas, Pointer<Uint8> input, int input_length, Pointer<Uint8> info, int info_length, Pointer<Uint8> mac, int mac_length) {
+  int result = _olm_sas_calculate_mac_unchecked(sas, input, input_length, info, info_length, mac, mac_length);
+  if (result == olm_error()) throw_olm(olm_sas_last_error(sas));
+  return result;
+}
+
+final _olm_sas_calculate_mac_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sas, Pointer<Uint8> input, IntPtr input_length, Pointer<Uint8> info, IntPtr info_length, Pointer<Uint8> mac, IntPtr mac_length),
+  int Function(Pointer<NativeType> sas, Pointer<Uint8> input, int input_length, Pointer<Uint8> info, int info_length, Pointer<Uint8> mac, int mac_length)
+>('olm_sas_calculate_mac');
+
+int olm_sas_calculate_mac_long_kdf(Pointer<NativeType> sas, Pointer<Uint8> input, int input_length, Pointer<Uint8> info, int info_length, Pointer<Uint8> mac, int mac_length) {
+  int result = _olm_sas_calculate_mac_long_kdf_unchecked(sas, input, input_length, info, info_length, mac, mac_length);
+  if (result == olm_error()) throw_olm(olm_sas_last_error(sas));
+  return result;
+}
+
+final _olm_sas_calculate_mac_long_kdf_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sas, Pointer<Uint8> input, IntPtr input_length, Pointer<Uint8> info, IntPtr info_length, Pointer<Uint8> mac, IntPtr mac_length),
+  int Function(Pointer<NativeType> sas, Pointer<Uint8> input, int input_length, Pointer<Uint8> info, int info_length, Pointer<Uint8> mac, int mac_length)
+>('olm_sas_calculate_mac_long_kdf');
