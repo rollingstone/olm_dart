@@ -547,6 +547,7 @@ class SAS {
     final mem = allocate<Uint8>(count: units.length + length);
     final outMem = mem.elementAt(units.length);
     try {
+      mem.asTypedList(units.length).setAll(0, units);
       olm_sas_generate_bytes(_inst, mem, units.length, outMem, length);
       return outMem.asTypedList(length);
     } finally {
