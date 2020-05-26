@@ -113,3 +113,39 @@ class SAS {
   external String calculate_mac(String input, String info);
   external String calculate_mac_long_kdf(String input, String info);
 }
+
+@JS()
+class PkEncryptResult {
+  String ciphertext;
+  String mac;
+  String ephemeral;
+}
+
+@JS()
+class PkEncryption {
+  external PkEncryption();
+  external void free();
+  external void set_recipient_key(String key);
+  external PkEncryptResult encrypt(String plaintext);
+}
+
+@JS()
+class PkDecryption {
+  external PkDecryption();
+  external void free();
+  external String init_with_private_key(Uint8List private_key);
+  external String generate_key();
+  external Uint8List get_private_key();
+  external String pickle(String key);
+  external String unpickle(String key, String data);
+  external String decrypt(String ephemeral_key, String mac, String ciphertext);
+}
+
+@JS()
+class PkSigning {
+  external PkSigning();
+  external void free();
+  external String init_with_seed(Uint8List seed);
+  external Uint8List generate_seed();
+  external String sign(String message);
+}

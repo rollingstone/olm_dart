@@ -563,3 +563,207 @@ class SAS {
     return _calculateMac(olm_sas_calculate_mac_long_kdf, _inst, input, info);
   }
 }
+
+class PkEncryptResult {
+  String ciphertext;
+  String mac;
+  String ephemeral;
+  PkEncryptResult._(this.ciphertext, this.mac, this.ephemeral);
+}
+
+class PkEncryption {
+  Pointer<Uint8> _mem;
+  Pointer<NativeType> _inst;
+
+  PkEncryption() {
+    _mem = allocate<Uint8>(count: olm_pk_encryption_size());
+    _inst = olm_pk_encryption(_mem);
+  }
+
+  void free() {
+    olm_clear_pk_encryption(_inst);
+    _inst = null;
+    ffi.free(_mem);
+  }
+
+  void set_recipient_key(String key) {
+    final units = utf8.encode(key);
+    final mem = allocate<Uint8>(count: units.length);
+    try {
+      mem.asTypedList(units.length).setAll(0, units);
+      olm_pk_encryption_set_recipient_key(_inst, mem, units.length);
+    } finally {
+      ffi.free(mem);
+    }
+  }
+
+  PkEncryptResult encrypt(String plaintext) {
+    final units = utf8.encode(plaintext);
+    final rndLen = olm_pk_encrypt_random_length(_inst);
+    final outLen = olm_pk_ciphertext_length(_inst, units.length);
+    final macLen = olm_pk_mac_length(_inst);
+    final ephLen = olm_pk_key_length();
+    final mem = allocate<Uint8>(count: units.length + rndLen + outLen + macLen + ephLen);
+    final rndMem = mem.elementAt(units.length);
+    final outMem = rndMem.elementAt(rndLen);
+    final macMem = outMem.elementAt(outLen);
+    final ephMem = macMem.elementAt(macLen);
+    try {
+      mem.asTypedList(units.length).setAll(0, units);
+      _fillRandom(rndMem.asTypedList(rndLen));
+      olm_pk_encrypt(_inst, mem, units.length, outMem, outLen, macMem, macLen, ephMem, ephLen, rndMem, rndLen);
+      return PkEncryptResult._(
+        utf8.decode(outMem.asTypedList(outLen)),
+        utf8.decode(macMem.asTypedList(macLen)),
+        utf8.decode(ephMem.asTypedList(ephLen))
+      );
+    } finally {
+      ffi.free(mem);
+    }
+  }
+}
+
+class PkDecryption {
+  Pointer<Uint8> _mem;
+  Pointer<NativeType> _inst;
+
+  PkDecryption() {
+    _mem = allocate<Uint8>(count: olm_pk_decryption_size());
+    _inst = olm_pk_decryption(_mem);
+  }
+
+  void free() {
+    olm_clear_pk_decryption(_inst);
+    _inst = null;
+    ffi.free(_mem);
+  }
+
+  String init_with_private_key(Uint8List private_key) {
+    final outLen = olm_pk_key_length();
+    final mem = allocate<Uint8>(count: private_key.length + outLen);
+    final outMem = mem.elementAt(private_key.length);
+    try {
+      mem.asTypedList(private_key.length).setAll(0, private_key);
+      olm_pk_key_from_private(_inst, outMem, outLen, mem, private_key.length);
+      return utf8.decode(outMem.asTypedList(outLen));
+    } finally {
+      ffi.free(mem);
+    }
+  }
+
+  String generate_key() {
+    final len = olm_pk_private_key_length();
+    final outLen = olm_pk_key_length();
+    final mem = allocate<Uint8>(count: len + outLen);
+    final outMem = mem.elementAt(len);
+    try {
+      _fillRandom(mem.asTypedList(len));
+      olm_pk_key_from_private(_inst, outMem, outLen, mem, len);
+      return utf8.decode(outMem.asTypedList(outLen));
+    } finally {
+      ffi.free(mem);
+    }
+  }
+
+  Uint8List get_private_key() {
+    final len = olm_pk_private_key_length();
+    final mem = allocate<Uint8>(count: len);
+    try {
+      olm_pk_get_private_key(_inst, mem, len);
+      return Uint8List.fromList(mem.asTypedList(len));
+    } finally {
+      ffi.free(mem);
+    }
+  }
+
+  String pickle(String key) {
+    return _pickle(olm_pickle_pk_decryption_length, olm_pickle_pk_decryption, _inst, key);
+  }
+
+  String unpickle(String key, String data) {
+    final dby = utf8.encode(data);
+    final kby = utf8.encode(key);
+    final outLen = olm_pk_key_length();
+    final mem = allocate<Uint8>(count: dby.length + kby.length + outLen);
+    final keyMem = mem.elementAt(dby.length);
+    final outMem = keyMem.elementAt(kby.length);
+    try {
+      mem.asTypedList(dby.length).setAll(0, dby);
+      keyMem.asTypedList(kby.length).setAll(0, kby);
+      olm_unpickle_pk_decryption(_inst, keyMem, kby.length, mem, dby.length, outMem, outLen);
+      return utf8.decode(outMem.asTypedList(outLen));
+    } finally {
+      ffi.free(mem);
+    }
+  }
+
+  String decrypt(String ephemeral_key, String mac, String ciphertext) {
+    final ephUnits = utf8.encode(ephemeral_key);
+    final macUnits = utf8.encode(mac);
+    final ciphertextUnits = utf8.encode(ciphertext);
+
+    int plaintextLen = olm_pk_max_plaintext_length(_inst, ciphertextUnits.length);
+    final mem = allocate<Uint8>(count: ephUnits.length + macUnits.length + ciphertextUnits.length + plaintextLen);
+    final macMem = mem.elementAt(ephUnits.length);
+    final ciphertextMem = macMem.elementAt(macUnits.length);
+    final plaintextMem = ciphertextMem.elementAt(ciphertextUnits.length);
+    try {
+      mem.asTypedList(ephUnits.length).setAll(0, ephUnits);
+      macMem.asTypedList(macUnits.length).setAll(0, macUnits);
+      ciphertextMem.asTypedList(ciphertextUnits.length).setAll(0, ciphertextUnits);
+      plaintextLen = olm_pk_decrypt(_inst, mem, ephUnits.length, macMem, macUnits.length, ciphertextMem, ciphertextUnits.length, plaintextMem, plaintextLen);
+      return utf8.decode(plaintextMem.asTypedList(plaintextLen));
+    } finally {
+      ffi.free(mem);
+    }
+  }
+}
+
+class PkSigning {
+  Pointer<Uint8> _mem;
+  Pointer<NativeType> _inst;
+
+  PkSigning() {
+    _mem = allocate<Uint8>(count: olm_pk_signing_size());
+    _inst = olm_pk_signing(_mem);
+  }
+
+  void free() {
+    olm_clear_pk_signing(_inst);
+    _inst = null;
+    ffi.free(_mem);
+  }
+
+  String init_with_seed(Uint8List seed) {
+    final outLen = olm_pk_signing_public_key_length();
+    final mem = allocate<Uint8>(count: seed.length + outLen);
+    final outMem = mem.elementAt(seed.length);
+    try {
+      mem.asTypedList(seed.length).setAll(0, seed);
+      olm_pk_signing_key_from_seed(_inst, outMem, outLen, mem, seed.length);
+      return utf8.decode(outMem.asTypedList(outLen));
+    } finally {
+      ffi.free(mem);
+    }
+  }
+
+  Uint8List generate_seed() {
+    final result = Uint8List(olm_pk_signing_seed_length());
+    _fillRandom(result);
+    return result;
+  }
+
+  String sign(String message) {
+    final units = utf8.encode(message);
+    final outLen = olm_pk_signature_length();
+    final mem = allocate<Uint8>(count: units.length + outLen);
+    final outMem = mem.elementAt(units.length);
+    try {
+      mem.asTypedList(units.length).setAll(0, units);
+      olm_pk_sign(_inst, mem, units.length, outMem, outLen);
+      return utf8.decode(outMem.asTypedList(outLen));
+    } finally {
+      ffi.free(mem);
+    }
+  }
+}

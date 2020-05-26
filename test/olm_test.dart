@@ -270,13 +270,54 @@ void main() async {
     final sas1 = olm.SAS();
     final sas1_pk = sas1.get_pubkey();
     expect(sas1_pk, allOf(isA<String>(), isNotEmpty));
-    sas1.free();
 
     final sas2 = olm.SAS();
     sas2.set_their_key(sas1_pk);
     expect(sas2.calculate_mac("INPUT", "INFO"), allOf(isA<String>(), isNotEmpty));
     expect(sas2.calculate_mac_long_kdf("INPUT", "INFO"), allOf(isA<String>(), isNotEmpty));
     expect(sas2.generate_bytes("INFO", test_length), allOf(isList, hasLength(test_length)));
+
+    sas1.set_their_key(sas2.get_pubkey());
+    final bytes1 = sas1.generate_bytes("INFO", test_length);
+    final bytes2 = sas2.generate_bytes("INFO", test_length);
+    for (var i = 0; i < test_length; i++) {
+      expect(bytes1[i], bytes2[i]);
+    }
+
+    expect(sas1.calculate_mac("INPUT", "INFO"), sas2.calculate_mac("INPUT", "INFO"));
+    expect(sas1.calculate_mac_long_kdf("INPUT", "INFO"), sas2.calculate_mac_long_kdf("INPUT", "INFO"));
+
+    sas1.free();
     sas2.free();
+  });
+
+  test("pk encrypt/decrypt", () async {
+    final key1 = olm.PkDecryption();
+    final public1 = key1.generate_key();
+    final enc = olm.PkEncryption();
+    enc.set_recipient_key(public1);
+    final res = enc.encrypt(test_message);
+    expect(key1.decrypt(res.ephemeral, res.mac, res.ciphertext), test_message);
+    final key2 = olm.PkDecryption();
+    expect(key2.init_with_private_key(key1.get_private_key()), public1);
+    expect(key2.decrypt(res.ephemeral, res.mac, res.ciphertext), test_message);
+    final key3 = olm.PkDecryption();
+    key3.unpickle(test_key, key1.pickle(test_key));
+    expect(key3.decrypt(res.ephemeral, res.mac, res.ciphertext), test_message);
+    enc.free();
+    key3.free();
+    key2.free();
+    key1.free();
+  });
+
+  test("pk signing", () async {
+    final key = olm.PkSigning();
+    final seed = key.generate_seed();
+    final public = key.init_with_seed(seed);
+    final signature = key.sign(test_message);
+    final util = olm.Utility();
+    util.ed25519_verify(public, test_message, signature);
+    key.free();
+    util.free();
   });
 }

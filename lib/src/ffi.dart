@@ -931,3 +931,276 @@ final _olm_sas_calculate_mac_long_kdf_unchecked = libolm.lookupFunction<
   IntPtr Function(Pointer<NativeType> sas, Pointer<Uint8> input, IntPtr input_length, Pointer<Uint8> info, IntPtr info_length, Pointer<Uint8> mac, IntPtr mac_length),
   int Function(Pointer<NativeType> sas, Pointer<Uint8> input, int input_length, Pointer<Uint8> info, int info_length, Pointer<Uint8> mac, int mac_length)
 >('olm_sas_calculate_mac_long_kdf');
+
+final olm_pk_encryption_size = libolm.lookupFunction<
+  IntPtr Function(),
+  int Function()
+>('olm_pk_encryption_size');
+
+final olm_pk_encryption = libolm.lookupFunction<
+  Pointer<NativeType> Function(Pointer<Uint8> memory),
+  Pointer<NativeType> Function(Pointer<Uint8> memory)
+>('olm_pk_encryption');
+
+final olm_pk_encryption_last_error = libolm.lookupFunction<
+  Pointer<Utf8> Function(Pointer<NativeType> encryption),
+  Pointer<Utf8> Function(Pointer<NativeType> encryption)
+>('olm_pk_encryption_last_error');
+
+int olm_clear_pk_encryption(Pointer<NativeType> encryption) {
+  int result = _olm_clear_pk_encryption_unchecked(encryption);
+  if (result == olm_error()) throw_olm(olm_pk_encryption_last_error(encryption));
+  return result;
+}
+
+final _olm_clear_pk_encryption_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> encryption),
+  int Function(Pointer<NativeType> encryption)
+>('olm_clear_pk_encryption');
+
+int olm_pk_encryption_set_recipient_key(Pointer<NativeType> encryption, Pointer<Uint8> public_key, int public_key_length) {
+  int result = _olm_pk_encryption_set_recipient_key_unchecked(encryption, public_key, public_key_length);
+  if (result == olm_error()) throw_olm(olm_pk_encryption_last_error(encryption));
+  return result;
+}
+
+final _olm_pk_encryption_set_recipient_key_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> encryption, Pointer<Uint8> public_key, IntPtr public_key_length),
+  int Function(Pointer<NativeType> encryption, Pointer<Uint8> public_key, int public_key_length)
+>('olm_pk_encryption_set_recipient_key');
+
+int olm_pk_ciphertext_length(Pointer<NativeType> encryption, int plaintext_length) {
+  int result = _olm_pk_ciphertext_length_unchecked(encryption, plaintext_length);
+  if (result == olm_error()) throw_olm(olm_pk_encryption_last_error(encryption));
+  return result;
+}
+
+final _olm_pk_ciphertext_length_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> encryption, IntPtr plaintext_length),
+  int Function(Pointer<NativeType> encryption, int plaintext_length)
+>('olm_pk_ciphertext_length');
+
+int olm_pk_mac_length(Pointer<NativeType> encryption) {
+  int result = _olm_pk_mac_length_unchecked(encryption);
+  if (result == olm_error()) throw_olm(olm_pk_encryption_last_error(encryption));
+  return result;
+}
+
+final _olm_pk_mac_length_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> encryption),
+  int Function(Pointer<NativeType> encryption)
+>('olm_pk_mac_length');
+
+final olm_pk_key_length = libolm.lookupFunction<
+  IntPtr Function(),
+  int Function()
+>('olm_pk_key_length');
+
+int olm_pk_encrypt_random_length(Pointer<NativeType> encryption) {
+  int result = _olm_pk_encrypt_random_length_unchecked(encryption);
+  if (result == olm_error()) throw_olm(olm_pk_encryption_last_error(encryption));
+  return result;
+}
+
+final _olm_pk_encrypt_random_length_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> encryption),
+  int Function(Pointer<NativeType> encryption)
+>('olm_pk_encrypt_random_length');
+
+int olm_pk_encrypt(Pointer<NativeType> encryption, Pointer<Uint8> plaintext, int plaintext_length, Pointer<Uint8> ciphertext, int ciphertext_length, Pointer<Uint8> mac, int mac_length, Pointer<Uint8> ephemeral_key, int ephemeral_key_size, Pointer<Uint8> random, int random_length) {
+  int result = _olm_pk_encrypt_unchecked(encryption, plaintext, plaintext_length, ciphertext, ciphertext_length, mac, mac_length, ephemeral_key, ephemeral_key_size, random, random_length);
+  if (result == olm_error()) throw_olm(olm_pk_encryption_last_error(encryption));
+  return result;
+}
+
+final _olm_pk_encrypt_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> encryption, Pointer<Uint8> plaintext, IntPtr plaintext_length, Pointer<Uint8> ciphertext, IntPtr ciphertext_length, Pointer<Uint8> mac, IntPtr mac_length, Pointer<Uint8> ephemeral_key, IntPtr ephemeral_key_size, Pointer<Uint8> random, IntPtr random_length),
+  int Function(Pointer<NativeType> encryption, Pointer<Uint8> plaintext, int plaintext_length, Pointer<Uint8> ciphertext, int ciphertext_length, Pointer<Uint8> mac, int mac_length, Pointer<Uint8> ephemeral_key, int ephemeral_key_size, Pointer<Uint8> random, int random_length)
+>('olm_pk_encrypt');
+
+final olm_pk_decryption_size = libolm.lookupFunction<
+  IntPtr Function(),
+  int Function()
+>('olm_pk_decryption_size');
+
+final olm_pk_decryption = libolm.lookupFunction<
+  Pointer<NativeType> Function(Pointer<Uint8> memory),
+  Pointer<NativeType> Function(Pointer<Uint8> memory)
+>('olm_pk_decryption');
+
+final olm_pk_decryption_last_error = libolm.lookupFunction<
+  Pointer<Utf8> Function(Pointer<NativeType> decryption),
+  Pointer<Utf8> Function(Pointer<NativeType> decryption)
+>('olm_pk_decryption_last_error');
+
+int olm_clear_pk_decryption(Pointer<NativeType> decryption) {
+  int result = _olm_clear_pk_decryption_unchecked(decryption);
+  if (result == olm_error()) throw_olm(olm_pk_decryption_last_error(decryption));
+  return result;
+}
+
+final _olm_clear_pk_decryption_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> decryption),
+  int Function(Pointer<NativeType> decryption)
+>('olm_clear_pk_decryption');
+
+final olm_pk_private_key_length = libolm.lookupFunction<
+  IntPtr Function(),
+  int Function()
+>('olm_pk_private_key_length');
+
+final olm_pk_generate_key_random_length = libolm.lookupFunction<
+  IntPtr Function(),
+  int Function()
+>('olm_pk_generate_key_random_length');
+
+int olm_pk_key_from_private(Pointer<NativeType> decryption, Pointer<Uint8> pubkey, int pubkey_length, Pointer<Uint8> privkey, int privkey_length) {
+  int result = _olm_pk_key_from_private_unchecked(decryption, pubkey, pubkey_length, privkey, privkey_length);
+  if (result == olm_error()) throw_olm(olm_pk_decryption_last_error(decryption));
+  return result;
+}
+
+final _olm_pk_key_from_private_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> decryption, Pointer<Uint8> pubkey, IntPtr pubkey_length, Pointer<Uint8> privkey, IntPtr privkey_length),
+  int Function(Pointer<NativeType> decryption, Pointer<Uint8> pubkey, int pubkey_length, Pointer<Uint8> privkey, int privkey_length)
+>('olm_pk_key_from_private');
+
+int olm_pk_generate_key(Pointer<NativeType> decryption, Pointer<Uint8> pubkey, int pubkey_length, Pointer<Uint8> privkey, int privkey_length) {
+  int result = _olm_pk_generate_key_unchecked(decryption, pubkey, pubkey_length, privkey, privkey_length);
+  if (result == olm_error()) throw_olm(olm_pk_decryption_last_error(decryption));
+  return result;
+}
+
+final _olm_pk_generate_key_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> decryption, Pointer<Uint8> pubkey, IntPtr pubkey_length, Pointer<Uint8> privkey, IntPtr privkey_length),
+  int Function(Pointer<NativeType> decryption, Pointer<Uint8> pubkey, int pubkey_length, Pointer<Uint8> privkey, int privkey_length)
+>('olm_pk_generate_key');
+
+int olm_pickle_pk_decryption_length(Pointer<NativeType> decryption) {
+  int result = _olm_pickle_pk_decryption_length_unchecked(decryption);
+  if (result == olm_error()) throw_olm(olm_pk_decryption_last_error(decryption));
+  return result;
+}
+
+final _olm_pickle_pk_decryption_length_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> decryption),
+  int Function(Pointer<NativeType> decryption)
+>('olm_pickle_pk_decryption_length');
+
+int olm_pickle_pk_decryption(Pointer<NativeType> decryption, Pointer<Uint8> key, int key_length, Pointer<Uint8> pickled, int pickled_length) {
+  int result = _olm_pickle_pk_decryption_unchecked(decryption, key, key_length, pickled, pickled_length);
+  if (result == olm_error()) throw_olm(olm_pk_decryption_last_error(decryption));
+  return result;
+}
+
+final _olm_pickle_pk_decryption_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> decryption, Pointer<Uint8> key, IntPtr key_length, Pointer<Uint8> pickled, IntPtr pickled_length),
+  int Function(Pointer<NativeType> decryption, Pointer<Uint8> key, int key_length, Pointer<Uint8> pickled, int pickled_length)
+>('olm_pickle_pk_decryption');
+
+int olm_unpickle_pk_decryption(Pointer<NativeType> decryption, Pointer<Uint8> key, int key_length, Pointer<Uint8> pickled, int pickled_length, Pointer<Uint8> pubkey, int pubkey_length) {
+  int result = _olm_unpickle_pk_decryption_unchecked(decryption, key, key_length, pickled, pickled_length, pubkey, pubkey_length);
+  if (result == olm_error()) throw_olm(olm_pk_decryption_last_error(decryption));
+  return result;
+}
+
+final _olm_unpickle_pk_decryption_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> decryption, Pointer<Uint8> key, IntPtr key_length, Pointer<Uint8> pickled, IntPtr pickled_length, Pointer<Uint8> pubkey, IntPtr pubkey_length),
+  int Function(Pointer<NativeType> decryption, Pointer<Uint8> key, int key_length, Pointer<Uint8> pickled, int pickled_length, Pointer<Uint8> pubkey, int pubkey_length)
+>('olm_unpickle_pk_decryption');
+
+int olm_pk_max_plaintext_length(Pointer<NativeType> decryption, int ciphertext_length) {
+  int result = _olm_pk_max_plaintext_length_unchecked(decryption, ciphertext_length);
+  if (result == olm_error()) throw_olm(olm_pk_decryption_last_error(decryption));
+  return result;
+}
+
+final _olm_pk_max_plaintext_length_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> decryption, IntPtr ciphertext_length),
+  int Function(Pointer<NativeType> decryption, int ciphertext_length)
+>('olm_pk_max_plaintext_length');
+
+int olm_pk_decrypt(Pointer<NativeType> decryption, Pointer<Uint8> ephemeral_key, int ephemeral_key_length, Pointer<Uint8> mac, int mac_length, Pointer<Uint8> ciphertext, int ciphertext_length, Pointer<Uint8> plaintext, int max_plaintext_length) {
+  int result = _olm_pk_decrypt_unchecked(decryption, ephemeral_key, ephemeral_key_length, mac, mac_length, ciphertext, ciphertext_length, plaintext, max_plaintext_length);
+  if (result == olm_error()) throw_olm(olm_pk_decryption_last_error(decryption));
+  return result;
+}
+
+final _olm_pk_decrypt_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> decryption, Pointer<Uint8> ephemeral_key, IntPtr ephemeral_key_length, Pointer<Uint8> mac, IntPtr mac_length, Pointer<Uint8> ciphertext, IntPtr ciphertext_length, Pointer<Uint8> plaintext, IntPtr max_plaintext_length),
+  int Function(Pointer<NativeType> decryption, Pointer<Uint8> ephemeral_key, int ephemeral_key_length, Pointer<Uint8> mac, int mac_length, Pointer<Uint8> ciphertext, int ciphertext_length, Pointer<Uint8> plaintext, int max_plaintext_length)
+>('olm_pk_decrypt');
+
+int olm_pk_get_private_key(Pointer<NativeType> decryption, Pointer<Uint8> private_key, int private_key_length) {
+  int result = _olm_pk_get_private_key_unchecked(decryption, private_key, private_key_length);
+  if (result == olm_error()) throw_olm(olm_pk_decryption_last_error(decryption));
+  return result;
+}
+
+final _olm_pk_get_private_key_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> decryption, Pointer<Uint8> private_key, IntPtr private_key_length),
+  int Function(Pointer<NativeType> decryption, Pointer<Uint8> private_key, int private_key_length)
+>('olm_pk_get_private_key');
+
+final olm_pk_signing_size = libolm.lookupFunction<
+  IntPtr Function(),
+  int Function()
+>('olm_pk_signing_size');
+
+final olm_pk_signing = libolm.lookupFunction<
+  Pointer<NativeType> Function(Pointer<Uint8> memory),
+  Pointer<NativeType> Function(Pointer<Uint8> memory)
+>('olm_pk_signing');
+
+final olm_pk_signing_last_error = libolm.lookupFunction<
+  Pointer<Utf8> Function(Pointer<NativeType> sign),
+  Pointer<Utf8> Function(Pointer<NativeType> sign)
+>('olm_pk_signing_last_error');
+
+int olm_clear_pk_signing(Pointer<NativeType> sign) {
+  int result = _olm_clear_pk_signing_unchecked(sign);
+  if (result == olm_error()) throw_olm(olm_pk_signing_last_error(sign));
+  return result;
+}
+
+final _olm_clear_pk_signing_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sign),
+  int Function(Pointer<NativeType> sign)
+>('olm_clear_pk_signing');
+
+int olm_pk_signing_key_from_seed(Pointer<NativeType> sign, Pointer<Uint8> pubkey, int pubkey_length, Pointer<Uint8> seed, int seed_length) {
+  int result = _olm_pk_signing_key_from_seed_unchecked(sign, pubkey, pubkey_length, seed, seed_length);
+  if (result == olm_error()) throw_olm(olm_pk_signing_last_error(sign));
+  return result;
+}
+
+final _olm_pk_signing_key_from_seed_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sign, Pointer<Uint8> pubkey, IntPtr pubkey_length, Pointer<Uint8> seed, IntPtr seed_length),
+  int Function(Pointer<NativeType> sign, Pointer<Uint8> pubkey, int pubkey_length, Pointer<Uint8> seed, int seed_length)
+>('olm_pk_signing_key_from_seed');
+
+final olm_pk_signing_seed_length = libolm.lookupFunction<
+  IntPtr Function(),
+  int Function()
+>('olm_pk_signing_seed_length');
+
+final olm_pk_signing_public_key_length = libolm.lookupFunction<
+  IntPtr Function(),
+  int Function()
+>('olm_pk_signing_public_key_length');
+
+final olm_pk_signature_length = libolm.lookupFunction<
+  IntPtr Function(),
+  int Function()
+>('olm_pk_signature_length');
+
+int olm_pk_sign(Pointer<NativeType> sign, Pointer<Uint8> message, int message_length, Pointer<Uint8> signature, int signature_length) {
+  int result = _olm_pk_sign_unchecked(sign, message, message_length, signature, signature_length);
+  if (result == olm_error()) throw_olm(olm_pk_signing_last_error(sign));
+  return result;
+}
+
+final _olm_pk_sign_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> sign, Pointer<Uint8> message, IntPtr message_length, Pointer<Uint8> signature, IntPtr signature_length),
+  int Function(Pointer<NativeType> sign, Pointer<Uint8> message, int message_length, Pointer<Uint8> signature, int signature_length)
+>('olm_pk_sign');
