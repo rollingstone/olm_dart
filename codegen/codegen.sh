@@ -4,4 +4,4 @@
 
 cd "$(dirname "$0")"/..
 codegen/autojs.jq < lib/native.dart > lib/js.dart
-printf '#include "%s"\n' olm/{olm,sas}.h | gcc -I native/olm/include -E - | sed -n ':a;/^#.*\Wolm\//{:b;n;/#/ba;/./p;bb}' | codegen/autoffi.jq > lib/src/ffi.dart
+printf '#include "%s"\n' olm/{olm,sas}.h | gcc -I native/olm/include -E - | awk '/^#/{f=/\Wolm\//;next};f' | codegen/autoffi.jq > lib/src/ffi.dart
