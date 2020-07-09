@@ -53,20 +53,20 @@ void _unpickle(_PickleUnpickleFunc func, Pointer<NativeType> inst, String data, 
 }
 
 String _calculateMac(_CalculateMacFunc func, Pointer<NativeType> inst, String input, String info) {
-    final inputUnits = utf8.encode(input);
-    final infoUnits = utf8.encode(info);
-    final outMemLen = olm_sas_mac_length(inst);
-    final mem = allocate<Uint8>(count: inputUnits.length + infoUnits.length + outMemLen);
-    final infoMem = mem.elementAt(inputUnits.length);
-    final outMem = infoMem.elementAt(infoUnits.length);
-    try {
-      mem.asTypedList(inputUnits.length).setAll(0, inputUnits);
-      infoMem.asTypedList(infoUnits.length).setAll(0, infoUnits);
-      func(inst, mem, inputUnits.length, infoMem, infoUnits.length, outMem, outMemLen);
-      return utf8.decode(outMem.asTypedList(outMemLen));
-    } finally {
-      ffi.free(mem);
-    }
+  final inputUnits = utf8.encode(input);
+  final infoUnits = utf8.encode(info);
+  final outMemLen = olm_sas_mac_length(inst);
+  final mem = allocate<Uint8>(count: inputUnits.length + infoUnits.length + outMemLen);
+  final infoMem = mem.elementAt(inputUnits.length);
+  final outMem = infoMem.elementAt(infoUnits.length);
+  try {
+    mem.asTypedList(inputUnits.length).setAll(0, inputUnits);
+    infoMem.asTypedList(infoUnits.length).setAll(0, infoUnits);
+    func(inst, mem, inputUnits.length, infoMem, infoUnits.length, outMem, outMemLen);
+    return utf8.decode(outMem.asTypedList(outMemLen));
+  } finally {
+    ffi.free(mem);
+  }
 }
 
 void _fillRandom(Uint8List list) {
