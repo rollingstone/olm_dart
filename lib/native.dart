@@ -549,7 +549,7 @@ class SAS {
     try {
       mem.asTypedList(units.length).setAll(0, units);
       olm_sas_generate_bytes(_inst, mem, units.length, outMem, length);
-      return outMem.asTypedList(length);
+      return Uint8List.fromList(outMem.asTypedList(length));
     } finally {
       ffi.free(mem);
     }
