@@ -7,3 +7,6 @@ cd "$(dirname "$0")"/..
 pub run test -p vm,chrome
 pub run test_coverage
 genhtml -o coverage coverage/lcov.info || true
+
+dart2native test/.test_coverage.dart
+valgrind --show-mismatched-frees=no --exit-on-first-error=yes --error-exitcode=1 test/.test_coverage.exe
