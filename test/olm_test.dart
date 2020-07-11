@@ -90,6 +90,7 @@ void main() async {
     bob_s.create_inbound(bob2, alice_message.body);
     final result = bob_s.decrypt(alice_message.type, alice_message.body);
     bob2.remove_one_time_keys(bob_s);
+    bob_s.free();
     bob2.free();
     alice_s2.free();
     alice2.free();
@@ -177,17 +178,41 @@ void main() async {
 
     final utility = olm.Utility();
     expect(() => utility.ed25519_verify(id_key, test_message, signature), throwsA(anything));
+    utility.free();
   });
 
   test("invalid method calls", () {
-    expect(() => olm.Account().unpickle(test_key, ""), throwsA(anything));
-    expect(() => olm.Session().unpickle(test_key, ""), throwsA(anything));
-    expect(() => olm.InboundGroupSession().unpickle(test_key, ""), throwsA(anything));
-    expect(() => olm.OutboundGroupSession().unpickle(test_key, ""), throwsA(anything));
-    expect(() => olm.Session().create_inbound_from(olm.Account(), "", ""), throwsA(anything));
-    expect(olm.Session().matches_inbound(""), false);
-    expect(() => olm.Session().matches_inbound_from("", ""), throwsA(anything));
-    expect(() => olm.InboundGroupSession().import_session(""), throwsA(anything));
+    final account1 = olm.Account();
+    expect(() => account1.unpickle(test_key, ""), throwsA(anything));
+
+    final session1 = olm.Session();
+    expect(() => session1.unpickle(test_key, ""), throwsA(anything));
+    session1.free();
+
+    final inbound1 = olm.InboundGroupSession();
+    expect(() => inbound1.unpickle(test_key, ""), throwsA(anything));
+    inbound1.free();
+
+    final outbound1 = olm.OutboundGroupSession();
+    expect(() => outbound1.unpickle(test_key, ""), throwsA(anything));
+    outbound1.free();
+
+    final session2 = olm.Session();
+    expect(() => session2.create_inbound_from(account1, "", ""), throwsA(anything));
+    session2.free();
+    account1.free();
+
+    final session3 = olm.Session();
+    expect(session3.matches_inbound(""), false);
+    session3.free();
+
+    final session4 = olm.Session();
+    expect(() => session4.matches_inbound_from("", ""), throwsA(anything));
+    session4.free();
+
+    final inbound2 = olm.InboundGroupSession();
+    expect(() => inbound2.import_session(""), throwsA(anything));
+    inbound2.free();
   });
 
   test("send multiple messages, one direction", () async {
