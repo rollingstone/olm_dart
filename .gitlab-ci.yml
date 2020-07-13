@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 stages:
-  - coverage
+  - test
   - deploy
 
 coverage:
   image: debian:testing
-  stage: coverage
+  stage: test
   needs: []
   coverage: '/^\s+lines.+: (\d+.\d*%)/'
   script:
@@ -29,7 +29,7 @@ coverage:
 
 code_analyze:
   image: cirrusci/flutter
-  stage: coverage
+  stage: test
   needs: []
   allow_failure: true
   script:
