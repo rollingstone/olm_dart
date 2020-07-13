@@ -4,6 +4,7 @@
 import 'package:olm/olm.dart' as olm;
 import 'package:test/test.dart';
 import 'dart:convert';
+import 'dart:typed_data';
 
 void main() async {
   const test_message = "Hello, World!";
@@ -213,6 +214,22 @@ void main() async {
     final inbound2 = olm.InboundGroupSession();
     expect(() => inbound2.import_session(""), throwsA(anything));
     inbound2.free();
+
+    final sas = olm.SAS();
+    expect(() => sas.set_their_key(""), throwsA(anything));
+    sas.free();
+
+    final pkd = olm.PkDecryption();
+    expect(() => pkd.unpickle(test_key, ""), throwsA(anything));
+    pkd.free();
+
+    final pke = olm.PkEncryption();
+    expect(() => pke.set_recipient_key(""), throwsA(anything));
+    pke.free();
+
+    final pks = olm.PkSigning();
+    expect(() => pks.init_with_seed(Uint8List(0)), throwsA(anything));
+    pks.free();
   });
 
   test("send multiple messages, one direction", () async {
