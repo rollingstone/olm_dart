@@ -8,8 +8,8 @@ stages:
 coverage:
   image: debian:testing
   stage: coverage
+  needs: []
   coverage: '/^\s+lines.+: (\d+.\d*%)/'
-  dependencies: []
   script:
     - apt update
     - apt install -y curl gnupg2
@@ -30,13 +30,14 @@ coverage:
 code_analyze:
   image: cirrusci/flutter
   stage: coverage
-  dependencies: []
+  needs: []
   allow_failure: true
   script:
     - flutter analyze
 
 pages:
   stage: deploy
+  needs: []
   image: cirrusci/flutter
   script:
     - ./scripts/doc.sh
