@@ -3,7 +3,6 @@
 
 name: olm
 description: Dart bindings for Olm
-author: Famedly GmbH <info@famedly.com>
 homepage: https://famedly.gitlab.io/libraries/dart-olm/
 repository: https://gitlab.com/famedly/libraries/dart-olm
 
