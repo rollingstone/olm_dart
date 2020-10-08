@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 name: olm
-description: Dart bindings for Olm
+description: Dart bindings for Olm, an implementation of the olm and megolm cryptographic ratchets
 homepage: https://famedly.gitlab.io/libraries/dart-olm/
 repository: https://gitlab.com/famedly/libraries/dart-olm
 
