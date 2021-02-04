@@ -4,7 +4,7 @@
 
 cd "$(dirname "$0")"/..
 [ -d native/olm ] && export LD_LIBRARY_PATH=$(pwd)/native/olm
-pub run test -p vm,chrome
+pub run test -p vm,firefox
 pub run test_coverage
 genhtml -o coverage coverage/lcov.info || true
 

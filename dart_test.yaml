@@ -2,3 +2,6 @@ override_platforms:
   chrome:
     settings:
       executable: chromium
+  firefox:
+    settings:
+      arguments: -headless

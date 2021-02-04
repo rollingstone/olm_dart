@@ -16,7 +16,7 @@ coverage:
     - curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
     - curl https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list
     - apt update
-    - apt install -y dart chromium lcov libolm3 valgrind
+    - apt install -y dart firefox-esr lcov libolm3 valgrind
     - echo 'export PATH="$PATH:/usr/lib/dart/bin"' > /etc/profile.d/dart.sh
     - . /etc/profile.d/dart.sh
     - useradd -m test
