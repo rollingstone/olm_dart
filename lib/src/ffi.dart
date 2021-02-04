@@ -599,6 +599,50 @@ final _olm_account_generate_one_time_keys_unchecked = libolm.lookupFunction<
   int Function(Pointer<NativeType> account, int number_of_keys, Pointer<Uint8> random, int random_length)
 >('olm_account_generate_one_time_keys');
 
+int olm_account_generate_fallback_key_random_length(Pointer<NativeType> account) {
+  int result = _olm_account_generate_fallback_key_random_length_unchecked(account);
+  if (result == olm_error()) throw_olm(olm_account_last_error(account));
+  return result;
+}
+
+final _olm_account_generate_fallback_key_random_length_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> account),
+  int Function(Pointer<NativeType> account)
+>('olm_account_generate_fallback_key_random_length');
+
+int olm_account_generate_fallback_key(Pointer<NativeType> account, Pointer<Uint8> random, int random_length) {
+  int result = _olm_account_generate_fallback_key_unchecked(account, random, random_length);
+  if (result == olm_error()) throw_olm(olm_account_last_error(account));
+  return result;
+}
+
+final _olm_account_generate_fallback_key_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> account, Pointer<Uint8> random, IntPtr random_length),
+  int Function(Pointer<NativeType> account, Pointer<Uint8> random, int random_length)
+>('olm_account_generate_fallback_key');
+
+int olm_account_fallback_key_length(Pointer<NativeType> account) {
+  int result = _olm_account_fallback_key_length_unchecked(account);
+  if (result == olm_error()) throw_olm(olm_account_last_error(account));
+  return result;
+}
+
+final _olm_account_fallback_key_length_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> account),
+  int Function(Pointer<NativeType> account)
+>('olm_account_fallback_key_length');
+
+int olm_account_fallback_key(Pointer<NativeType> account, Pointer<Uint8> fallback_key, int fallback_key_size) {
+  int result = _olm_account_fallback_key_unchecked(account, fallback_key, fallback_key_size);
+  if (result == olm_error()) throw_olm(olm_account_last_error(account));
+  return result;
+}
+
+final _olm_account_fallback_key_unchecked = libolm.lookupFunction<
+  IntPtr Function(Pointer<NativeType> account, Pointer<Uint8> fallback_key, IntPtr fallback_key_size),
+  int Function(Pointer<NativeType> account, Pointer<Uint8> fallback_key, int fallback_key_size)
+>('olm_account_fallback_key');
+
 int olm_create_outbound_session_random_length(Pointer<NativeType> session) {
   int result = _olm_create_outbound_session_random_length_unchecked(session);
   if (result == olm_error()) throw_olm(olm_session_last_error(session));
@@ -887,6 +931,11 @@ final _olm_sas_set_their_key_unchecked = libolm.lookupFunction<
   IntPtr Function(Pointer<NativeType> sas, Pointer<Uint8> their_key, IntPtr their_key_length),
   int Function(Pointer<NativeType> sas, Pointer<Uint8> their_key, int their_key_length)
 >('olm_sas_set_their_key');
+
+final olm_sas_is_their_key_set = libolm.lookupFunction<
+  Int32 Function(Pointer<NativeType> sas),
+  int Function(Pointer<NativeType> sas)
+>('olm_sas_is_their_key_set');
 
 int olm_sas_generate_bytes(Pointer<NativeType> sas, Pointer<Uint8> info, int info_length, Pointer<Uint8> output, int output_length) {
   int result = _olm_sas_generate_bytes_unchecked(sas, info, info_length, output, output_length);

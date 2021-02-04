@@ -4,6 +4,4 @@
 
 cd "$(dirname "$0")"/..
 mkdir js
-cd js
-curl -O 'https://packages.matrix.org/npm/olm/olm-3.1.4.tgz'
-tar xaf olm-3.1.4.tgz
+curl -L "https://packages.matrix.org/npm/olm/olm-3.2.1.tgz" | tar xz -C js
