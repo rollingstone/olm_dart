@@ -158,6 +158,10 @@ class Account extends _NativeObject {
     return _readStr(olm_account_one_time_keys_length, olm_account_one_time_keys, _inst);
   }
 
+  String fallback_key() {
+    return _readStr(olm_account_fallback_key_length, olm_account_fallback_key, _inst);
+  }
+
   String pickle(String key) {
     return _pickle(olm_pickle_account_length, olm_pickle_account, _inst, key);
   }
@@ -168,6 +172,10 @@ class Account extends _NativeObject {
 
   void generate_one_time_keys(int count) {
     _createRandom((inst, random, size) => olm_account_generate_one_time_keys(_inst, count, random, size), (inst) => olm_account_generate_one_time_keys_random_length(inst, count), _inst);
+  }
+
+  void generate_fallback_key() {
+    _createRandom(olm_account_generate_fallback_key, olm_account_generate_fallback_key_random_length, _inst);
   }
 
   void remove_one_time_keys(Session session) {

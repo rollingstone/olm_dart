@@ -37,9 +37,11 @@ class Account {
   external void create();
   external String identity_keys();
   external String one_time_keys();
+  external String fallback_key();
   external String pickle(String key);
   external void unpickle(String key, String data);
   external void generate_one_time_keys(int count);
+  external void generate_fallback_key();
   external void remove_one_time_keys(Session session);
   external void mark_keys_as_published();
   external int max_number_of_one_time_keys();
