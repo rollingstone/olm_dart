@@ -85,9 +85,8 @@ void _createRandom(void Function(Pointer<NativeType>, Pointer<Uint8> random, int
   }
 }
 
-Future<void> init() {
+Future<void> init() async {
   olm_get_library_version; // just load the function, not calling it
-  return Future.sync(() {});
 }
 
 List<int> get_library_version() {

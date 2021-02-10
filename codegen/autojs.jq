@@ -30,7 +30,7 @@ foreach( foreach(
     if .p then del(.p, .s) else . end | if .co then . else
         if .s then .s += "\n" + $l.s else $l + {c} end
       | if .s | count("\\(") == count("\\)") then
-            if .s | test("\\)\\s*{") then
+            if .s | test("\\)\\s*(async)?\\s*{") then
                 .s |= (sub("\\s*{.*$"; ";") | sub("^(?<sp>\\s*)"; .sp + "external "))
               | .co = .c
               | (.m1, .m2) = if .pre then 1 else 2 end
