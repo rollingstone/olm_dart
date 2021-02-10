@@ -30,7 +30,7 @@
 					<li class="box" data-repo="dart-olm">
 						Dart Bindings Code (native.dart)
 					<li class="box" data-repo="dart-olm">
-						Dart FFI (src/ffi.dart)
+						Dart FFI (ffi.dart)
 					<li class="box" data-repo="olm">
 						libolm
 					<li class="box" data-repo="platform">
