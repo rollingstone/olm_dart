@@ -6,19 +6,13 @@ stages:
   - deploy
 
 coverage:
-  image: debian:testing
+  image: archlinux:latest
   stage: test
   needs: []
   coverage: '/^\s+lines.+: (\d+.\d*%)/'
   script:
-    - apt update
-    - apt install -y curl gnupg2
-    - curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-    - curl https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list
-    - apt update
-    - apt install -y dart firefox-esr lcov libolm3 valgrind
-    - echo 'export PATH="$PATH:/usr/lib/dart/bin"' > /etc/profile.d/dart.sh
-    - . /etc/profile.d/dart.sh
+    - pacman --noconfirm -Syu
+    - pacman --noconfirm -S dart firefox libolm valgrind
     - useradd -m test
     - chown -R 'test:' '.'
     - su -c ./scripts/prepare.sh test
