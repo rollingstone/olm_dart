@@ -74,7 +74,7 @@ void _fillRandom(Uint8List list) {
   list.setAll(0, Iterable.generate(list.length, (i) => rng.nextInt(256)));
 }
 
-void _createRandom(void Function(Pointer<NativeType>, Pointer<Uint8> random, int size) func, _ObjectLengthFunc len, NativeType inst) {
+void _createRandom(void Function(Pointer<NativeType>, Pointer<Uint8> random, int size) func, _ObjectLengthFunc len, Pointer<NativeType> inst) {
   final l = len(inst);
   final mem = allocate<Uint8>(count: l);
   try {
@@ -335,7 +335,7 @@ class Utility {
   }
 
   String sha256(String input) {
-    return sha256_bytes(utf8.encode(input));
+    return sha256_bytes(utf8.encoder.convert(input));
   }
 
   /// Not implemented for Web in upstream olm.
