@@ -1,6 +1,7 @@
 // Copyright (c) 2020 Famedly GmbH
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'common.dart';
 import 'ffi.dart';
 import 'dart:convert';
 import 'dart:ffi';
@@ -99,15 +100,16 @@ void _createRandom(void Function(Pointer<NativeType>, Pointer<Uint8> random, int
 
 class _NativeObject {
   Pointer<Uint8> _mem;
-  Pointer<NativeType> _inst;
+  Pointer<NativeType> _maybeInst;
+  Pointer<NativeType> get _inst => _maybeInst ?? (throw UseAfterFreeError());
 
   _NativeObject(int Function() get_size, Pointer<NativeType> Function(Pointer<Uint8>) create) {
     _mem = allocate<Uint8>(count: get_size());
-    _inst = create(_mem);
+    _maybeInst = create(_mem);
   }
 
   void _freed() {
-    _inst = null;
+    _maybeInst = null;
     free(_mem);
   }
 }
