@@ -311,7 +311,7 @@ void main() async {
 
     final sas1 = olm.SAS();
     final sas1_pk = sas1.get_pubkey();
-    expect(sas1_pk, allOf(isA<String>(), isNotEmpty));
+    expect(sas1_pk, allOf(isA<String>(), isNotEmpty, isNot(contains('\x00'))));
 
     final sas2 = olm.SAS();
     sas2.set_their_key(sas1_pk);

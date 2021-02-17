@@ -17,6 +17,18 @@ String _readStr(_ObjectLengthFunc len, int Function(Pointer<NativeType>, Pointer
   final l = len(inst);
   final mem = allocate<Uint8>(count: l);
   try {
+    final dl = data(inst, mem, l);
+    assert(dl <= l);
+    return utf8.decode(mem.asTypedList(dl));
+  } finally {
+    free(mem);
+  }
+}
+
+String _readStr2(_ObjectLengthFunc len, int Function(Pointer<NativeType>, Pointer<Uint8>, int) data, Pointer<NativeType> inst) {
+  final l = len(inst);
+  final mem = allocate<Uint8>(count: l);
+  try {
     data(inst, mem, l);
     return utf8.decode(mem.asTypedList(l));
   } finally {
@@ -507,7 +519,7 @@ class SAS extends _NativeObject {
   }
 
   String get_pubkey() {
-    return _readStr(olm_sas_pubkey_length, olm_sas_get_pubkey, _inst);
+    return _readStr2(olm_sas_pubkey_length, olm_sas_get_pubkey, _inst);
   }
 
   void set_their_key(String their_key) {
