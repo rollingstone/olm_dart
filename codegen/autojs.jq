@@ -29,8 +29,10 @@ foreach( foreach(
 ) as $l ({c: 0};
     if .p then del(.p, .s) else . end | if .co then . else
         if .s then .s += "\n" + $l.s else $l + {c} end
-      | if .s | count("\\(") == count("\\)") then
-            if .s | test("\\)\\s*(async)?\\s*{") then
+      | if .s | count("\\(") == count("\\)") and (test("\\)\\s*(async)?\\s*$") | not) then
+            .s |= sub("\\s*extends +[^ ]*"; "")
+          | .s |= sub("\\s*: +[^{;]*"; "")
+          | if .s | (test("\\)\\s*(async)?\\s*[{;]") or test("[ .]_")) then
                 .s |= (sub("\\s*{.*$"; ";") | sub("^(?<sp>\\s*)"; .sp + "external "))
               | .co = .c
               | (.m1, .m2) = if .pre then 1 else 2 end

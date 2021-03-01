@@ -85,6 +85,21 @@ void _createRandom(void Function(Pointer<NativeType>, Pointer<Uint8> random, int
   }
 }
 
+class _NativeObject {
+  Pointer<Uint8> _mem;
+  Pointer<NativeType> _inst;
+
+  _NativeObject(int Function() get_size, Pointer<NativeType> Function(Pointer<Uint8>) create) {
+    _mem = allocate<Uint8>(count: get_size());
+    _inst = create(_mem);
+  }
+
+  void _freed() {
+    _inst = null;
+    free(_mem);
+  }
+}
+
 Future<void> init() async {
   olm_get_library_version; // just load the function, not calling it
 }
@@ -111,19 +126,12 @@ class DecryptResult {
   DecryptResult._(this.message_index, this.plaintext);
 }
 
-class Account {
-  Pointer<Uint8> _mem;
-  Pointer<NativeType> _inst;
-
-  Account() {
-    _mem = allocate<Uint8>(count: olm_account_size());
-    _inst = olm_account(_mem);
-  }
+class Account extends _NativeObject {
+  Account() : super(olm_account_size, olm_account);
 
   void free() {
     olm_clear_account(_inst);
-    _inst = null;
-    ffi.free(_mem);
+    _freed();
   }
 
   void create() {
@@ -177,19 +185,12 @@ class Account {
   }
 }
 
-class Session {
-  Pointer<Uint8> _mem;
-  Pointer<NativeType> _inst;
-
-  Session() {
-    _mem = allocate<Uint8>(count: olm_session_size());
-    _inst = olm_session(_mem);
-  }
+class Session extends _NativeObject {
+  Session() : super(olm_session_size, olm_session);
 
   void free() {
     olm_clear_session(_inst);
-    _inst = null;
-    ffi.free(_mem);
+    _freed();
   }
 
   String pickle(String key) {
@@ -318,19 +319,12 @@ class Session {
   }
 }
 
-class Utility {
-  Pointer<Uint8> _mem;
-  Pointer<NativeType> _inst;
-
-  Utility() {
-    _mem = allocate<Uint8>(count: olm_utility_size());
-    _inst = olm_utility(_mem);
-  }
+class Utility extends _NativeObject {
+  Utility() : super(olm_utility_size, olm_utility);
 
   void free() {
     olm_clear_utility(_inst);
-    _inst = null;
-    ffi.free(_mem);
+    _freed();
   }
 
   String sha256(String input) {
@@ -364,33 +358,30 @@ class Utility {
     final key_units = utf8.encode(key);
     final message_units = utf8.encode(message);
     final signature_units = utf8.encode(signature);
-    final mem1 = allocate<Uint8>(count: key_units.length + message_units.length + signature_units.length);
+    final mem1 = allocate<Uint8>(
+        count:
+            key_units.length + message_units.length + signature_units.length);
     final mem2 = mem1.elementAt(key_units.length);
     final mem3 = mem2.elementAt(message_units.length);
     try {
       mem1.asTypedList(key_units.length).setAll(0, key_units);
       mem2.asTypedList(message_units.length).setAll(0, message_units);
       mem3.asTypedList(signature_units.length).setAll(0, signature_units);
-      olm_ed25519_verify(_inst, mem1, key_units.length, mem2, message_units.length, mem3, signature_units.length);
+      olm_ed25519_verify(_inst, mem1, key_units.length, mem2,
+          message_units.length, mem3, signature_units.length);
     } finally {
       ffi.free(mem1);
     }
   }
 }
 
-class InboundGroupSession {
-  Pointer<Uint8> _mem;
-  Pointer<NativeType> _inst;
-
-  InboundGroupSession() {
-    _mem = allocate<Uint8>(count: olm_inbound_group_session_size());
-    _inst = olm_inbound_group_session(_mem);
-  }
+class InboundGroupSession extends _NativeObject {
+  InboundGroupSession()
+      : super(olm_inbound_group_session_size, olm_inbound_group_session);
 
   void free() {
     olm_clear_inbound_group_session(_inst);
-    _inst = null;
-    ffi.free(_mem);
+    _freed();
   }
 
   String pickle(String key) {
@@ -456,19 +447,13 @@ class InboundGroupSession {
   }
 }
 
-class OutboundGroupSession {
-  Pointer<Uint8> _mem;
-  Pointer<NativeType> _inst;
-
-  OutboundGroupSession() {
-    _mem = allocate<Uint8>(count: olm_outbound_group_session_size());
-    _inst = olm_outbound_group_session(_mem);
-  }
+class OutboundGroupSession extends _NativeObject {
+  OutboundGroupSession()
+      : super(olm_outbound_group_session_size, olm_outbound_group_session);
 
   void free() {
     olm_clear_outbound_group_session(_inst);
-    _inst = null;
-    ffi.free(_mem);
+    _freed();
   }
 
   String pickle(String key) {
@@ -506,24 +491,19 @@ class OutboundGroupSession {
   }
 
   String session_key() {
-    return _readStr(olm_outbound_group_session_key_length, olm_outbound_group_session_key, _inst);
+    return _readStr(olm_outbound_group_session_key_length,
+        olm_outbound_group_session_key, _inst);
   }
 }
 
-class SAS {
-  Pointer<Uint8> _mem;
-  Pointer<NativeType> _inst;
-
-  SAS() {
-    _mem = allocate<Uint8>(count: olm_sas_size());
-    _inst = olm_sas(_mem);
+class SAS extends _NativeObject {
+  SAS() : super(olm_sas_size, olm_sas) {
     _createRandom(olm_create_sas, olm_create_sas_random_length, _inst);
   }
 
   void free() {
     olm_clear_sas(_inst);
-    _inst = null;
-    ffi.free(_mem);
+    _freed();
   }
 
   String get_pubkey() {
@@ -570,19 +550,12 @@ class PkEncryptResult {
   PkEncryptResult._(this.ciphertext, this.mac, this.ephemeral);
 }
 
-class PkEncryption {
-  Pointer<Uint8> _mem;
-  Pointer<NativeType> _inst;
-
-  PkEncryption() {
-    _mem = allocate<Uint8>(count: olm_pk_encryption_size());
-    _inst = olm_pk_encryption(_mem);
-  }
+class PkEncryption extends _NativeObject {
+  PkEncryption() : super(olm_pk_encryption_size, olm_pk_encryption);
 
   void free() {
     olm_clear_pk_encryption(_inst);
-    _inst = null;
-    ffi.free(_mem);
+    _freed();
   }
 
   void set_recipient_key(String key) {
@@ -622,19 +595,12 @@ class PkEncryption {
   }
 }
 
-class PkDecryption {
-  Pointer<Uint8> _mem;
-  Pointer<NativeType> _inst;
-
-  PkDecryption() {
-    _mem = allocate<Uint8>(count: olm_pk_decryption_size());
-    _inst = olm_pk_decryption(_mem);
-  }
+class PkDecryption extends _NativeObject {
+  PkDecryption() : super(olm_pk_decryption_size, olm_pk_decryption);
 
   void free() {
     olm_clear_pk_decryption(_inst);
-    _inst = null;
-    ffi.free(_mem);
+    _freed();
   }
 
   String init_with_private_key(Uint8List private_key) {
@@ -718,19 +684,12 @@ class PkDecryption {
   }
 }
 
-class PkSigning {
-  Pointer<Uint8> _mem;
-  Pointer<NativeType> _inst;
-
-  PkSigning() {
-    _mem = allocate<Uint8>(count: olm_pk_signing_size());
-    _inst = olm_pk_signing(_mem);
-  }
+class PkSigning extends _NativeObject {
+  PkSigning() : super(olm_pk_signing_size, olm_pk_signing);
 
   void free() {
     olm_clear_pk_signing(_inst);
-    _inst = null;
-    ffi.free(_mem);
+    _freed();
   }
 
   String init_with_seed(Uint8List seed) {
