@@ -1,3 +1,10 @@
+## [1.3.0](https://gitlab.com/famedly/libraries/dart-olm/compare/1.2.1...1.3.0) (2021-03-01)
+
+
+### Features
+
+* account fallback key ([4c2fb28](https://gitlab.com/famedly/libraries/dart-olm/commit/4c2fb28913eb4ea9a678722ad9c0f1ddf5912d57))
+
 ### [1.2.1](https://gitlab.com/famedly/libraries/dart-olm/compare/1.2.0...1.2.1) (2020-07-14)
 
 
