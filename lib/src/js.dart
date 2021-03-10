@@ -20,14 +20,14 @@ external List<int> get_library_version();
 
 @JS()
 class EncryptResult {
-  int type;
-  String body;
+  external int type;
+  external String body;
 }
 
 @JS()
 class DecryptResult {
-  int message_index;
-  String plaintext;
+  external int message_index;
+  external String plaintext;
 }
 
 @JS()
@@ -118,9 +118,9 @@ class SAS {
 
 @JS()
 class PkEncryptResult {
-  String ciphertext;
-  String mac;
-  String ephemeral;
+  external String ciphertext;
+  external String mac;
+  external String ephemeral;
 }
 
 @JS()

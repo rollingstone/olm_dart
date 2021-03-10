@@ -99,11 +99,11 @@ void _createRandom(void Function(Pointer<NativeType>, Pointer<Uint8> random, int
 
 class _NativeObject {
   Pointer<Uint8> _mem;
-  Pointer<NativeType> _maybeInst;
+  Pointer<NativeType>? _maybeInst;
   Pointer<NativeType> get _inst => _maybeInst ?? (throw UseAfterFreeError());
 
-  _NativeObject(int Function() get_size, Pointer<NativeType> Function(Pointer<Uint8>) create) {
-    _mem = malloc.call<Uint8>(get_size());
+  _NativeObject(int Function() get_size, Pointer<NativeType> Function(Pointer<Uint8>) create)
+    : _mem = malloc.call<Uint8>(get_size()) {
     _maybeInst = create(_mem);
   }
 
