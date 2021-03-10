@@ -8,7 +8,6 @@ import 'dart:ffi';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
-import 'package:ffi/ffi.dart' as ffi;
 
 typedef _ObjectLengthFunc = int Function(Pointer<NativeType>);
 typedef _PickleUnpickleFunc = int Function(Pointer<NativeType>, Pointer<Uint8>, int, Pointer<Uint8>, int);
@@ -16,52 +15,52 @@ typedef _CalculateMacFunc = int Function(Pointer<NativeType>, Pointer<Uint8>, in
 
 String _readStr(_ObjectLengthFunc len, int Function(Pointer<NativeType>, Pointer<Uint8>, int) data, Pointer<NativeType> inst) {
   final l = len(inst);
-  final mem = allocate<Uint8>(count: l);
+  final mem = malloc.call<Uint8>(l);
   try {
     final dl = data(inst, mem, l);
     assert(dl <= l);
     return utf8.decode(mem.asTypedList(dl));
   } finally {
-    free(mem);
+    malloc.free(mem);
   }
 }
 
 String _readStr2(_ObjectLengthFunc len, int Function(Pointer<NativeType>, Pointer<Uint8>, int) data, Pointer<NativeType> inst) {
   final l = len(inst);
-  final mem = allocate<Uint8>(count: l);
+  final mem = malloc.call<Uint8>(l);
   try {
     data(inst, mem, l);
     return utf8.decode(mem.asTypedList(l));
   } finally {
-    free(mem);
+    malloc.free(mem);
   }
 }
 
 String _pickle(_ObjectLengthFunc len, _PickleUnpickleFunc data, Pointer<NativeType> inst, String key) {
   final units = utf8.encode(key);
   final outLen = len(inst);
-  final mem = allocate<Uint8>(count: units.length + outLen);
+  final mem = malloc.call<Uint8>(units.length + outLen);
   final outMem = mem.elementAt(units.length);
   try {
     mem.asTypedList(units.length).setAll(0, units);
     data(inst, mem, units.length, outMem, outLen);
     return utf8.decode(outMem.asTypedList(outLen));
   } finally {
-    free(mem);
+    malloc.free(mem);
   }
 }
 
 void _unpickle(_PickleUnpickleFunc func, Pointer<NativeType> inst, String data, String key) {
   final dby = utf8.encode(data);
   final kby = utf8.encode(key);
-  final mem = allocate<Uint8>(count: dby.length + kby.length);
+  final mem = malloc.call<Uint8>(dby.length + kby.length);
   final keyMem = mem.elementAt(dby.length);
   try {
     mem.asTypedList(dby.length).setAll(0, dby);
     keyMem.asTypedList(kby.length).setAll(0, kby);
     func(inst, keyMem, kby.length, mem, dby.length);
   } finally {
-    free(mem);
+    malloc.free(mem);
   }
 }
 
@@ -69,7 +68,7 @@ String _calculateMac(_CalculateMacFunc func, Pointer<NativeType> inst, String in
   final inputUnits = utf8.encode(input);
   final infoUnits = utf8.encode(info);
   final outMemLen = olm_sas_mac_length(inst);
-  final mem = allocate<Uint8>(count: inputUnits.length + infoUnits.length + outMemLen);
+  final mem = malloc.call<Uint8>(inputUnits.length + infoUnits.length + outMemLen);
   final infoMem = mem.elementAt(inputUnits.length);
   final outMem = infoMem.elementAt(infoUnits.length);
   try {
@@ -78,7 +77,7 @@ String _calculateMac(_CalculateMacFunc func, Pointer<NativeType> inst, String in
     func(inst, mem, inputUnits.length, infoMem, infoUnits.length, outMem, outMemLen);
     return utf8.decode(outMem.asTypedList(outMemLen));
   } finally {
-    ffi.free(mem);
+    malloc.free(mem);
   }
 }
 
@@ -89,12 +88,12 @@ void _fillRandom(Uint8List list) {
 
 void _createRandom(void Function(Pointer<NativeType>, Pointer<Uint8> random, int size) func, _ObjectLengthFunc len, Pointer<NativeType> inst) {
   final l = len(inst);
-  final mem = allocate<Uint8>(count: l);
+  final mem = malloc.call<Uint8>(l);
   try {
     _fillRandom(mem.asTypedList(l));
     func(inst, mem, l);
   } finally {
-    free(mem);
+    malloc.free(mem);
   }
 }
 
@@ -104,13 +103,13 @@ class _NativeObject {
   Pointer<NativeType> get _inst => _maybeInst ?? (throw UseAfterFreeError());
 
   _NativeObject(int Function() get_size, Pointer<NativeType> Function(Pointer<Uint8>) create) {
-    _mem = allocate<Uint8>(count: get_size());
+    _mem = malloc.call<Uint8>(get_size());
     _maybeInst = create(_mem);
   }
 
   void _freed() {
     _maybeInst = null;
-    free(_mem);
+    malloc.free(_mem);
   }
 }
 
@@ -119,12 +118,12 @@ Future<void> init() async {
 }
 
 List<int> get_library_version() {
-  final mem = allocate<Uint8>(count: 3);
+  final mem = malloc.call<Uint8>(3);
   try {
     olm_get_library_version(mem.elementAt(0), mem.elementAt(1), mem.elementAt(2));
     return List<int>.from(mem.asTypedList(3));
   } finally {
-    free(mem);
+    malloc.free(mem);
   }
 }
 
@@ -195,14 +194,14 @@ class Account extends _NativeObject {
   String sign(String message) {
     final units = utf8.encode(message);
     final outLen = olm_account_signature_length(_inst);
-    final mem = allocate<Uint8>(count: units.length + outLen);
+    final mem = malloc.call<Uint8>(units.length + outLen);
     final outMem = mem.elementAt(units.length);
     try {
       mem.asTypedList(units.length).setAll(0, units);
       olm_account_sign(_inst, mem, units.length, outMem, outLen);
       return utf8.decode(outMem.asTypedList(outLen));
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 }
@@ -227,7 +226,7 @@ class Session extends _NativeObject {
     final identity_key_units = utf8.encode(identity_key);
     final one_time_key_units = utf8.encode(one_time_key);
     final randomLen = olm_create_outbound_session_random_length(_inst);
-    final mem = allocate<Uint8>(count: identity_key_units.length + one_time_key_units.length + randomLen);
+    final mem = malloc.call<Uint8>(identity_key_units.length + one_time_key_units.length + randomLen);
     final otMem = mem.elementAt(identity_key_units.length);
     final rndMem = otMem.elementAt(one_time_key_units.length);
     try {
@@ -236,32 +235,32 @@ class Session extends _NativeObject {
       _fillRandom(rndMem.asTypedList(randomLen));
       olm_create_outbound_session(_inst, account._inst, mem, identity_key_units.length, otMem, one_time_key_units.length, rndMem, randomLen);
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
   void create_inbound(Account account, String message) {
     final message_units = utf8.encode(message);
-    final mem = allocate<Uint8>(count: message_units.length);
+    final mem = malloc.call<Uint8>(message_units.length);
     try {
       mem.asTypedList(message_units.length).setAll(0, message_units);
       olm_create_inbound_session(_inst, account._inst, mem, message_units.length);
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
   void create_inbound_from(Account account, String identity_key, String one_time_key) {
     final identity_key_units = utf8.encode(identity_key);
     final one_time_key_units = utf8.encode(one_time_key);
-    final mem = allocate<Uint8>(count: identity_key_units.length + one_time_key_units.length);
+    final mem = malloc.call<Uint8>(identity_key_units.length + one_time_key_units.length);
     final otMem = mem.elementAt(identity_key_units.length);
     try {
       mem.asTypedList(identity_key_units.length).setAll(0, identity_key_units);
       otMem.asTypedList(one_time_key_units.length).setAll(0, one_time_key_units);
       olm_create_inbound_session_from(_inst, account._inst, mem, identity_key_units.length, otMem, one_time_key_units.length);
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
@@ -279,26 +278,26 @@ class Session extends _NativeObject {
 
   bool matches_inbound(String message) {
     final message_units = utf8.encode(message);
-    final mem = allocate<Uint8>(count: message_units.length);
+    final mem = malloc.call<Uint8>(message_units.length);
     mem.asTypedList(message_units.length).setAll(0, message_units);
     try {
       return olm_matches_inbound_session(_inst, mem, message_units.length) != 0;
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
   bool matches_inbound_from(String identity_key, String message) {
     final identity_key_units = utf8.encode(identity_key);
     final message_units = utf8.encode(message);
-    final mem = allocate<Uint8>(count: identity_key_units.length + message_units.length);
+    final mem = malloc.call<Uint8>(identity_key_units.length + message_units.length);
     final mem2 = mem.elementAt(identity_key_units.length);
     mem.asTypedList(identity_key_units.length).setAll(0, identity_key_units);
     mem2.asTypedList(message_units.length).setAll(0, message_units);
     try {
       return olm_matches_inbound_session_from(_inst, mem, identity_key_units.length, mem2, message_units.length) != 0;
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
@@ -306,7 +305,7 @@ class Session extends _NativeObject {
     final units = utf8.encode(plaintext);
     final randomLen = olm_encrypt_random_length(_inst);
     final outLen = olm_encrypt_message_length(_inst, units.length);
-    final mem = allocate<Uint8>(count: units.length + randomLen + outLen);
+    final mem = malloc.call<Uint8>(units.length + randomLen + outLen);
     final rndMem = mem.elementAt(units.length);
     final outMem = rndMem.elementAt(randomLen);
     try {
@@ -317,26 +316,26 @@ class Session extends _NativeObject {
       final result2 = utf8.decode(outMem.asTypedList(outLen));
       return EncryptResult._(result1, result2);
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
   String decrypt(int message_type, String message) {
     final units = utf8.encode(message);
-    final mem = allocate<Uint8>(count: units.length);
+    final mem = malloc.call<Uint8>(units.length);
     try {
       mem.asTypedList(units.length).setAll(0, units);
       int outLen = olm_decrypt_max_plaintext_length(_inst, message_type, mem, units.length);
       mem.asTypedList(units.length).setAll(0, units);
-      final outMem = allocate<Uint8>(count: outLen);
+      final outMem = malloc.call<Uint8>(outLen);
       try {
         outLen = olm_decrypt(_inst, message_type, mem, units.length, outMem, outLen);
         return utf8.decode(outMem.asTypedList(outLen));
       } finally {
-        ffi.free(outMem);
+        malloc.free(outMem);
       }
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 }
@@ -355,24 +354,24 @@ class Utility extends _NativeObject {
 
   /// Not implemented for Web in upstream olm.
   String sha256_bytes(Uint8List input) {
-    final mem = allocate<Uint8>(count: input.length);
+    final mem = malloc.call<Uint8>(input.length);
     mem.asTypedList(input.length).setAll(0, input);
     try {
       return sha256_pointer(mem, input.length);
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
   /// Available for Native only.
   String sha256_pointer(Pointer<Uint8> input, int size) {
     final outLen = olm_sha256_length(_inst);
-    final outMem = allocate<Uint8>(count: outLen);
+    final outMem = malloc.call<Uint8>(outLen);
     try {
       olm_sha256(_inst, input, size, outMem, outLen);
       return utf8.decode(outMem.asTypedList(outLen));
     } finally {
-      ffi.free(outMem);
+      malloc.free(outMem);
     }
   }
 
@@ -380,9 +379,8 @@ class Utility extends _NativeObject {
     final key_units = utf8.encode(key);
     final message_units = utf8.encode(message);
     final signature_units = utf8.encode(signature);
-    final mem1 = allocate<Uint8>(
-        count:
-            key_units.length + message_units.length + signature_units.length);
+    final mem1 = malloc.call<Uint8>(
+        key_units.length + message_units.length + signature_units.length);
     final mem2 = mem1.elementAt(key_units.length);
     final mem3 = mem2.elementAt(message_units.length);
     try {
@@ -392,7 +390,7 @@ class Utility extends _NativeObject {
       olm_ed25519_verify(_inst, mem1, key_units.length, mem2,
           message_units.length, mem3, signature_units.length);
     } finally {
-      ffi.free(mem1);
+      malloc.free(mem1);
     }
   }
 }
@@ -416,43 +414,43 @@ class InboundGroupSession extends _NativeObject {
 
   void create(String session_key) {
     final units = utf8.encode(session_key);
-    final mem = allocate<Uint8>(count: units.length);
+    final mem = malloc.call<Uint8>(units.length);
     try {
       mem.asTypedList(units.length).setAll(0, units);
       olm_init_inbound_group_session(_inst, mem, units.length);
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
   void import_session(String session_key) {
     final units = utf8.encode(session_key);
-    final mem = allocate<Uint8>(count: units.length);
+    final mem = malloc.call<Uint8>(units.length);
     try {
       mem.asTypedList(units.length).setAll(0, units);
       olm_import_inbound_group_session(_inst, mem, units.length);
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
   DecryptResult decrypt(String message) {
     final units = utf8.encode(message);
-    final mem = allocate<Uint8>(count: units.length);
+    final mem = malloc.call<Uint8>(units.length);
     try {
       mem.asTypedList(units.length).setAll(0, units);
       int outLen = olm_group_decrypt_max_plaintext_length(_inst, mem, units.length);
       mem.asTypedList(units.length).setAll(0, units);
-      final outMem = allocate<Uint8>(count: outLen + 4);
+      final outMem = malloc.call<Uint8>(outLen + 4);
       final outMem2 = outMem.elementAt(outLen).cast<Uint32>();
       try {
         outLen = olm_group_decrypt(_inst, mem, units.length, outMem, outLen, outMem2);
         return DecryptResult._(outMem2.value, utf8.decode(outMem.asTypedList(outLen)));
       } finally {
-        ffi.free(outMem);
+        malloc.free(outMem);
       }
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
@@ -493,14 +491,14 @@ class OutboundGroupSession extends _NativeObject {
   String encrypt(String plaintext) {
     final units = utf8.encode(plaintext);
     final outLen = olm_group_encrypt_message_length(_inst, units.length);
-    final mem = allocate<Uint8>(count: units.length + outLen);
+    final mem = malloc.call<Uint8>(units.length + outLen);
     final outMem = mem.elementAt(units.length);
     try {
       mem.asTypedList(units.length).setAll(0, units);
       olm_group_encrypt(_inst, mem, units.length, outMem, outLen);
       return utf8.decode(outMem.asTypedList(outLen));
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
@@ -534,25 +532,25 @@ class SAS extends _NativeObject {
 
   void set_their_key(String their_key) {
     final units = utf8.encode(their_key);
-    final mem = allocate<Uint8>(count: units.length);
+    final mem = malloc.call<Uint8>(units.length);
     try {
       mem.asTypedList(units.length).setAll(0, units);
       olm_sas_set_their_key(_inst, mem, units.length);
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
   Uint8List generate_bytes(String info, int length) {
     final units = utf8.encode(info);
-    final mem = allocate<Uint8>(count: units.length + length);
+    final mem = malloc.call<Uint8>(units.length + length);
     final outMem = mem.elementAt(units.length);
     try {
       mem.asTypedList(units.length).setAll(0, units);
       olm_sas_generate_bytes(_inst, mem, units.length, outMem, length);
       return Uint8List.fromList(outMem.asTypedList(length));
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
@@ -582,12 +580,12 @@ class PkEncryption extends _NativeObject {
 
   void set_recipient_key(String key) {
     final units = utf8.encode(key);
-    final mem = allocate<Uint8>(count: units.length);
+    final mem = malloc.call<Uint8>(units.length);
     try {
       mem.asTypedList(units.length).setAll(0, units);
       olm_pk_encryption_set_recipient_key(_inst, mem, units.length);
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
@@ -597,7 +595,7 @@ class PkEncryption extends _NativeObject {
     final outLen = olm_pk_ciphertext_length(_inst, units.length);
     final macLen = olm_pk_mac_length(_inst);
     final ephLen = olm_pk_key_length();
-    final mem = allocate<Uint8>(count: units.length + rndLen + outLen + macLen + ephLen);
+    final mem = malloc.call<Uint8>(units.length + rndLen + outLen + macLen + ephLen);
     final rndMem = mem.elementAt(units.length);
     final outMem = rndMem.elementAt(rndLen);
     final macMem = outMem.elementAt(outLen);
@@ -612,7 +610,7 @@ class PkEncryption extends _NativeObject {
         utf8.decode(ephMem.asTypedList(ephLen))
       );
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 }
@@ -627,39 +625,39 @@ class PkDecryption extends _NativeObject {
 
   String init_with_private_key(Uint8List private_key) {
     final outLen = olm_pk_key_length();
-    final mem = allocate<Uint8>(count: private_key.length + outLen);
+    final mem = malloc.call<Uint8>(private_key.length + outLen);
     final outMem = mem.elementAt(private_key.length);
     try {
       mem.asTypedList(private_key.length).setAll(0, private_key);
       olm_pk_key_from_private(_inst, outMem, outLen, mem, private_key.length);
       return utf8.decode(outMem.asTypedList(outLen));
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
   String generate_key() {
     final len = olm_pk_private_key_length();
     final outLen = olm_pk_key_length();
-    final mem = allocate<Uint8>(count: len + outLen);
+    final mem = malloc.call<Uint8>(len + outLen);
     final outMem = mem.elementAt(len);
     try {
       _fillRandom(mem.asTypedList(len));
       olm_pk_key_from_private(_inst, outMem, outLen, mem, len);
       return utf8.decode(outMem.asTypedList(outLen));
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
   Uint8List get_private_key() {
     final len = olm_pk_private_key_length();
-    final mem = allocate<Uint8>(count: len);
+    final mem = malloc.call<Uint8>(len);
     try {
       olm_pk_get_private_key(_inst, mem, len);
       return Uint8List.fromList(mem.asTypedList(len));
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
@@ -671,7 +669,7 @@ class PkDecryption extends _NativeObject {
     final dby = utf8.encode(data);
     final kby = utf8.encode(key);
     final outLen = olm_pk_key_length();
-    final mem = allocate<Uint8>(count: dby.length + kby.length + outLen);
+    final mem = malloc.call<Uint8>(dby.length + kby.length + outLen);
     final keyMem = mem.elementAt(dby.length);
     final outMem = keyMem.elementAt(kby.length);
     try {
@@ -680,7 +678,7 @@ class PkDecryption extends _NativeObject {
       olm_unpickle_pk_decryption(_inst, keyMem, kby.length, mem, dby.length, outMem, outLen);
       return utf8.decode(outMem.asTypedList(outLen));
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
@@ -690,7 +688,7 @@ class PkDecryption extends _NativeObject {
     final ciphertextUnits = utf8.encode(ciphertext);
 
     int plaintextLen = olm_pk_max_plaintext_length(_inst, ciphertextUnits.length);
-    final mem = allocate<Uint8>(count: ephUnits.length + macUnits.length + ciphertextUnits.length + plaintextLen);
+    final mem = malloc.call<Uint8>(ephUnits.length + macUnits.length + ciphertextUnits.length + plaintextLen);
     final macMem = mem.elementAt(ephUnits.length);
     final ciphertextMem = macMem.elementAt(macUnits.length);
     final plaintextMem = ciphertextMem.elementAt(ciphertextUnits.length);
@@ -701,7 +699,7 @@ class PkDecryption extends _NativeObject {
       plaintextLen = olm_pk_decrypt(_inst, mem, ephUnits.length, macMem, macUnits.length, ciphertextMem, ciphertextUnits.length, plaintextMem, plaintextLen);
       return utf8.decode(plaintextMem.asTypedList(plaintextLen));
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 }
@@ -716,14 +714,14 @@ class PkSigning extends _NativeObject {
 
   String init_with_seed(Uint8List seed) {
     final outLen = olm_pk_signing_public_key_length();
-    final mem = allocate<Uint8>(count: seed.length + outLen);
+    final mem = malloc.call<Uint8>(seed.length + outLen);
     final outMem = mem.elementAt(seed.length);
     try {
       mem.asTypedList(seed.length).setAll(0, seed);
       olm_pk_signing_key_from_seed(_inst, outMem, outLen, mem, seed.length);
       return utf8.decode(outMem.asTypedList(outLen));
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 
@@ -736,14 +734,14 @@ class PkSigning extends _NativeObject {
   String sign(String message) {
     final units = utf8.encode(message);
     final outLen = olm_pk_signature_length();
-    final mem = allocate<Uint8>(count: units.length + outLen);
+    final mem = malloc.call<Uint8>(units.length + outLen);
     final outMem = mem.elementAt(units.length);
     try {
       mem.asTypedList(units.length).setAll(0, units);
       olm_pk_sign(_inst, mem, units.length, outMem, outLen);
       return utf8.decode(outMem.asTypedList(outLen));
     } finally {
-      ffi.free(mem);
+      malloc.free(mem);
     }
   }
 }
