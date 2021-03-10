@@ -5,5 +5,3 @@ pubspec.lock
 doc/api/
 js/
 native/
-test/.test_coverage.dart
-test/.test_coverage.exe
