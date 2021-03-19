@@ -1,3 +1,14 @@
+# [2.0.0](https://gitlab.com/famedly/libraries/dart-olm/compare/1.3.0...2.0.0) (2021-03-19)
+
+
+## Features
+
+* add UseAfterFreeError ([c5ff144](https://gitlab.com/famedly/libraries/dart-olm/commit/c5ff1441c1736dc3a1a1ce054ca2bcf687daa1a1))
+* compatibility with ffi 1.0.0 ([e271aee](https://gitlab.com/famedly/libraries/dart-olm/commit/e271aeeba8106dc888ad31128d9f342d8466ca78))
+* migrate to null-safety ([89d6e0c](https://gitlab.com/famedly/libraries/dart-olm/commit/89d6e0cefb81031a344d231d8cff6138b775d1e3))
+
+
+
 # [1.3.0](https://gitlab.com/famedly/libraries/dart-olm/compare/1.2.1...1.3.0) (2021-03-01)
 
 
