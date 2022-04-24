@@ -1,4 +1,4 @@
-# olm Dart Bindings
+# olm Dart Bindings (copied from https://famedly.gitlab.io/libraries/dart-olm/#architecture)
 
 ## Architecture
 [Visualization](https://famedly.gitlab.io/libraries/dart-olm/#architecture).
